@@ -15,7 +15,9 @@ are, and gives you a reason to come back tomorrow.
 
 🐉 **Boss of the day.** Your due-card load, drawn as one of 26 hand-made
 monsters. Its HP is the work ahead, and the damage you deal depends on how well
-you answered, not on how fast.
+you answered, not on how fast. Which creature turns up depends on how heavy the
+day is compared to *your* usual one, so a real boss stays rare: roughly one day
+in twenty, and one in seven when the pile is brutal.
 
 ⚔️ **Battle HUD in the queue.** HP and XP bars, damage numbers rising off the
 monster, combo counter, day streak. Optional chiptune sounds.
@@ -33,7 +35,9 @@ dark silhouette until you meet it, full colour once you take it down.
 cards a day it takes to get there.
 
 🎨 **Shop.** Coins buy four screen themes (Game Boy DMG, Crypt, Forge,
-Parchment), companions and streak tokens. Never stat boosts.
+Parchment), companions and streak tokens. Never stat boosts. It is slow on
+purpose: a full day pays 35 coins and the cheapest item costs 250, so the first
+one arrives after a week of studying rather than on the second evening.
 
 🌍 **Italian and English**, following RemNote's language unless you pick one.
 
