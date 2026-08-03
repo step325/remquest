@@ -165,6 +165,8 @@ export const EN: Record<keyof typeof IT, string> = {
   'settings.section': 'Settings',
   'settings.langAuto': 'Same as RemNote ({n})',
   'settings.language': 'Language',
+  'settings.coffee': 'BUY ME A COFFEE',
+  'settings.coffeeNote': 'Remquest is free and stays free.',
   'settings.danger': 'Danger zone',
   'settings.resetIntro':
     'Wipes XP, level, coins, streak, bestiary, deeds and history. What you have studied in RemNote is untouched.',

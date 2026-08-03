@@ -163,6 +163,8 @@ export const IT = {
   'settings.section': 'Impostazioni',
   'settings.langAuto': 'Come RemNote ({n})',
   'settings.language': 'Lingua',
+  'settings.coffee': 'OFFRIMI UN CAFFÈ',
+  'settings.coffeeNote': 'Remquest è gratis e resta gratis.',
   'settings.danger': 'Zona pericolosa',
   'settings.resetIntro':
     'Azzera XP, livello, monete, serie di giorni, bestiario, imprese e storico. Quello che hai studiato in RemNote non si tocca.',

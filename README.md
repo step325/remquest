@@ -189,6 +189,12 @@ Everything below was learned the expensive way, on SDK 0.0.46.
 - **The app's language is not exposed.** `navigator.language` inside the widget
   is the closest thing available.
 
+## Support
+
+Remquest is free and stays free. If it made a wall of due cards easier to climb:
+
+<a href="https://www.buymeacoffee.com/step325" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me a Coffee" height="48"></a>
+
 ## Privacy
 
 The plugin makes no network requests and sends nothing anywhere. All state lives

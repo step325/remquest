@@ -13,6 +13,9 @@ import { useState } from 'react';
 import { AUTO_LANG, LANGS, type Lang, type Translate } from '../lib/i18n/index';
 import { Section } from './components';
 
+/** Dove si offre il caffe'. Un indirizzo solo, scritto una volta */
+const COFFEE_URL = 'https://www.buymeacoffee.com/step325';
+
 /** Il nome di una lingua, scritto in quella lingua */
 const LANG_NAMES: Record<Lang, string> = { it: 'Italiano', en: 'English' };
 
@@ -122,6 +125,32 @@ function DangerZone({
   );
 }
 
+/**
+ * L'offerta del caffe'.
+ *
+ * Un collegamento di testo e non il bottone ufficiale: quello e' un'immagine
+ * presa da un CDN esterno, e dentro l'iframe di un widget non e' detto che
+ * arrivi. Il testo si vede sempre.
+ *
+ * `noreferrer` oltre a `noopener`: la pagina che si apre non ha motivo di
+ * sapere da dove arriva.
+ */
+function Coffee({ t }: { t: Translate }) {
+  return (
+    <div className="rq-coffee">
+      <span className="rq-coffee-note">{t('settings.coffeeNote')}</span>
+      <a
+        className="rq-button"
+        href={COFFEE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {t('settings.coffee')}
+      </a>
+    </div>
+  );
+}
+
 export function SettingsPanel({
   lang,
   chosen,
@@ -144,6 +173,7 @@ export function SettingsPanel({
   return (
     <Section title={t('settings.section')}>
       <LanguagePicker lang={lang} chosen={chosen} onPick={onLang} t={t} />
+      <Coffee t={t} />
       <DangerZone
         lifetimeXp={lifetimeXp}
         coins={coins}

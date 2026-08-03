@@ -333,3 +333,31 @@
   background: var(--px-blood-dark);
   border-color: var(--px-blood);
 }
+
+/*
+ * L'offerta del caffe'.
+ *
+ * Sta fra la lingua e la zona pericolosa, in mezzo al niente: non deve
+ * assomigliare a un pulsante di gioco ne' rubare l'occhio a chi e' entrato
+ * qui per un'altra ragione.
+ */
+.rq-coffee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--px-unit) * 3);
+  margin-bottom: calc(var(--px-unit) * 6);
+}
+
+.rq-coffee-note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--px-soft);
+}
+
+/* Un collegamento vestito da pulsante: gli `<a>` non ereditano il testo */
+a.rq-button {
+  display: inline-block;
+  text-decoration: none;
+}
