@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  bossRemaining,
   xpFromCardReview,
   cardIdFromPayload,
   updateStreak,
@@ -289,5 +290,41 @@ test('protezione della serie', async (t) => {
   await t.test('giornata gia' + "'" + ' contata: niente gettoni doppi', () => {
     const cur = con(7, 1, '2026-08-01');
     assert.equal(updateStreak(cur, '2026-08-01', '2026-07-31', '2026-07-30'), cur);
+  });
+});
+
+test('bossRemaining', async (t) => {
+  const giorno = (cardsDone: number, bossDamage: number) => ({
+    ...freshDayState('2026-08-03'),
+    cardsDone,
+    bossDamage,
+  });
+
+  await t.test('scala i punti vita con il danno inflitto', () => {
+    assert.equal(bossRemaining(100, 20, giorno(5, 30)), 70);
+  });
+
+  await t.test('non scende sotto zero', () => {
+    assert.equal(bossRemaining(100, 20, giorno(5, 250)), 0);
+  });
+
+  await t.test('finite le card il boss cade comunque', () => {
+    // Chi risponde sempre "Partially recalled" arriverebbe a fine giornata con
+    // il boss ancora in piedi: sarebbe una punizione per aver studiato.
+    assert.equal(bossRemaining(100, 20, giorno(20, 30)), 0);
+  });
+
+  await t.test('una volta caduto non si rialza', () => {
+    // Il ricalcolo di fine sessione ripassava di qui e riportava in vita un
+    // boss gia' abbattuto: la coda si svuotava, si prendevano le monete, e
+    // riaprendo il pannello il mostro era di nuovo in piedi.
+    const dopo = { ...giorno(20, 30), queueCleared: 1 };
+    assert.equal(bossRemaining(100, 20, dopo), 0);
+    // ...nemmeno se nel frattempo sono comparse altre card da fare
+    assert.equal(bossRemaining(100, 40, dopo), 0);
+  });
+
+  await t.test('senza misura non c\'e\' battaglia', () => {
+    assert.equal(bossRemaining(0, 0, giorno(0, 0)), 0);
   });
 });

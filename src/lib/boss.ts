@@ -9,7 +9,12 @@
  */
 
 import type { RNPlugin } from '@remnote/plugin-sdk';
-import { type DayState, HP_PER_CARD, crossedHalfway } from './gamification';
+import {
+  bossRemaining,
+  type DayState,
+  HP_PER_CARD,
+  crossedHalfway,
+} from './gamification';
 import type { FxEmitter } from './fx';
 import { countDueCards } from './due_cards';
 import { todayKey } from './dates';
@@ -64,7 +69,7 @@ export async function refreshBossPlan(deps: BossDeps): Promise<void> {
     ...freshBossState(today),
     maxHp,
     cardsPlanned,
-    remaining: Math.max(0, maxHp - day.bossDamage),
+    remaining: bossRemaining(maxHp, cardsPlanned, day),
     backlog: counted.backlog,
   });
 
@@ -95,8 +100,7 @@ export async function applyBossDamage(deps: BossDeps): Promise<void> {
   const [boss, day] = [await readBoss(deps.plugin, today), await deps.currentDay()];
   if (boss.maxHp === 0) return; // il boss non e' ancora stato misurato
 
-  const cardsFinished = boss.cardsPlanned > 0 && day.cardsDone >= boss.cardsPlanned;
-  const remaining = cardsFinished ? 0 : Math.max(0, boss.maxHp - day.bossDamage);
+  const remaining = bossRemaining(boss.maxHp, boss.cardsPlanned, day);
   if (remaining === boss.remaining) return;
 
   await writeBoss(deps.plugin, { ...boss, remaining });

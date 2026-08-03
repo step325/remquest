@@ -317,6 +317,25 @@ export function clampXp(xpToAdd: number, alreadyEarned: number, cap: number): nu
  * Sta qui e non in boss.ts perche' quello importa l'SDK e non si puo'
  * verificare da solo: le regole pure devono restare raggiungibili dai test.
  */
+/**
+ * I punti vita che restano al boss.
+ *
+ * Il boss cade in due modi: finiti i punti vita, oppure finite le card in
+ * programma. Il secondo caso serve perche' il danno dipende da come rispondi:
+ * chi risponde sempre "Partially recalled" arriverebbe in fondo alla giornata
+ * con il mostro ancora in piedi, che e' una punizione per aver studiato.
+ *
+ * E una volta caduto resta caduto. Il ricalcolo di fine sessione passava di
+ * qui e rimetteva in piedi un boss gia' abbattuto: si svuotava la coda, si
+ * incassavano le monete, e riaprendo il pannello il mostro era di nuovo vivo.
+ */
+export function bossRemaining(maxHp: number, cardsPlanned: number, day: DayState): number {
+  if (maxHp <= 0) return 0;
+  if (day.queueCleared > 0) return 0;
+  if (cardsPlanned > 0 && day.cardsDone >= cardsPlanned) return 0;
+  return Math.max(0, maxHp - day.bossDamage);
+}
+
 export function crossedHalfway(day: DayState, maxHp: number): boolean {
   if (maxHp <= 0 || day.halfwayDone > 0) return false;
   return day.bossDamage * 2 >= maxHp;
