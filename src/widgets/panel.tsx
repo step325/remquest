@@ -58,7 +58,6 @@ import { Bar, Stat, MissionRow, ExamRow, Section } from '../ui/components';
 import { PixelSprite } from '../ui/pixel_sprite';
 import { CHEST_OPEN } from '../ui/sprites';
 import { monsterSprite } from '../ui/monsters';
-import { monsterForDay } from '../lib/bestiary';
 
 /** Perche' la lista e' vuota: "non ne hai" e "non sono riuscito a leggerli" sono cose diverse */
 function emptyExamsMessage(t: Translate, state: ExamsState): string {
@@ -211,7 +210,7 @@ function Panel() {
               <PixelSprite sprite={CHEST_OPEN} scale={3} />
             ) : (
               <span className="rq-boss-idle">
-                <PixelSprite sprite={monsterSprite(monsterForDay(today, boss.cardsPlanned))} scale={3} />
+                <PixelSprite sprite={monsterSprite(boss.monster)} scale={3} />
               </span>
             )}
             <div>

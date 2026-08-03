@@ -41,7 +41,6 @@ import {
   normalizeBossState,
 } from '../lib/storage';
 import { playSound, unlockAudio } from '../lib/audio';
-import { monsterForDay } from '../lib/bestiary';
 import { freshWallet, normalizeWallet } from '../lib/wallet';
 import { companionMood, moodLabel } from '../lib/mood';
 import { themeClass } from '../lib/shop';
@@ -125,9 +124,9 @@ function QueueHud() {
   const remaining = boss.remaining;
   const defeated = remaining === 0 && boss.maxHp > 0;
   const damage = bossDamagePercent(boss.maxHp, remaining ?? 0);
-  // Chi si affronta oggi dipende dal giorno e da quante card ci sono: le
-  // giornate pesanti schierano un boss, quelle leggere una creatura comune.
-  const monster = monsterForDay(today, boss.cardsPlanned);
+  // Chi si affronta oggi lo ha gia' deciso il motore e sta nello stato del
+  // boss: qui si disegna soltanto.
+  const monster = boss.monster;
   const wallet = normalizeWallet(rawWallet);
   const t = translator(resolveLang(rawLang, appLocale()));
 

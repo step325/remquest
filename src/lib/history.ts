@@ -60,6 +60,22 @@ export function activeDays(history: History): number {
 }
 
 /** Il numero di card della giornata piu' piena: serve a scalare le colonnine */
+/**
+ * Le card di una giornata tipo: la media dei giorni in cui hai studiato.
+ *
+ * Serve a capire se oggi e' pesante *per te*: e' il numero a cui il bestiario
+ * rapporta il carico. I giorni a zero restano fuori apposta — chi salta una
+ * settimana non deve ritrovarsi la media dimezzata e mostri piu' grossi al
+ * rientro, che sarebbe una punizione per essere tornato.
+ *
+ * Zero vuol dire "non lo so ancora": chi legge usa un carico di riferimento.
+ */
+export function averageCards(history: History): number {
+  const attive = history.filter((record) => record.cards > 0);
+  if (attive.length === 0) return 0;
+  return attive.reduce((n, record) => n + record.cards, 0) / attive.length;
+}
+
 export function busiestDay(history: History): number {
   return history.reduce((max, r) => Math.max(max, r.cards), 0);
 }

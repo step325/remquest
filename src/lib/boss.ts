@@ -17,16 +17,18 @@ import {
 } from './gamification';
 import type { FxEmitter } from './fx';
 import { countDueCards } from './due_cards';
+import { averageCards } from './history';
 import { todayKey } from './dates';
 import {
   readBoss,
+  readHistory,
   writeBoss,
   writeDay,
   freshBossState,
   readCollection,
   writeCollection,
 } from './storage';
-import { monsterForDay } from './bestiary';
+import { type Monster, monsterForDay } from './bestiary';
 import { withDefeated, withSeen } from './collection';
 import type { Totals } from './feats';
 import { COINS_HALFWAY, COINS_PER_BOSS } from './wallet';
@@ -65,22 +67,30 @@ export async function refreshBossPlan(deps: BossDeps): Promise<void> {
 
   const cardsPlanned = Math.max(boss.cardsPlanned, counted.today);
 
+  // Il mostro si sceglie una volta sola, al primo conteggio della giornata:
+  // rifarlo a ogni ricalcolo lo cambierebbe sotto gli occhi quando la media o
+  // il carico si spostano di poco.
+  const monster =
+    boss.maxHp > 0
+      ? boss.monster
+      : monsterForDay(today, cardsPlanned, averageCards(await readHistory(deps.plugin)));
+
   await writeBoss(deps.plugin, {
     ...freshBossState(today),
     maxHp,
     cardsPlanned,
     remaining: bossRemaining(maxHp, cardsPlanned, day),
     backlog: counted.backlog,
+    monster,
   });
 
   // Chi si e' presentato oggi entra nel bestiario anche se non lo si abbatte:
   // averlo incontrato e' gia' qualcosa, abbatterlo e' un'altra.
-  await recordSeen(deps, cardsPlanned, today);
+  await recordSeen(deps, monster);
 }
 
 /** Segna nel bestiario il mostro di oggi, senza riscrivere se c'era gia' */
-async function recordSeen(deps: BossDeps, cardsPlanned: number, today: string): Promise<void> {
-  const monster = monsterForDay(today, cardsPlanned);
+async function recordSeen(deps: BossDeps, monster: Monster): Promise<void> {
   const collection = await readCollection(deps.plugin);
   const next = withSeen(collection, monster);
   if (next !== collection) await writeCollection(deps.plugin, next);
@@ -121,9 +131,8 @@ export async function applyBossDamage(deps: BossDeps): Promise<void> {
     await deps.emit({ kind: 'bossdown', damage: boss.maxHp });
     deps.notifier.now();
 
-    const monster = monsterForDay(today, boss.cardsPlanned);
     const collection = await readCollection(deps.plugin);
-    const next = withDefeated(collection, monster);
+    const next = withDefeated(collection, boss.monster);
     if (next !== collection) await writeCollection(deps.plugin, next);
 
     await deps.payCoins(COINS_PER_BOSS);

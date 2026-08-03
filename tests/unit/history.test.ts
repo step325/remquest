@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  averageCards,
   HISTORY_DAYS,
   activeDays,
   busiestDay,
@@ -98,5 +99,28 @@ test('normalizeHistory', async (t) => {
     assert.equal(h[0].cards, 0);
     assert.equal(h[0].xp, 0);
     assert.equal(h[0].won, false, 'solo un vero booleano conta come vittoria');
+  });
+});
+
+test('averageCards', async (t) => {
+  const storia = (...cards: number[]) =>
+    cards.map((n, i) => ({ day: `2026-07-${String(i + 1).padStart(2, '0')}`, cards: n, xp: n * 8, won: false }));
+
+  await t.test('senza storico non c\'e\' media', () => {
+    assert.equal(averageCards(freshHistory()), 0);
+  });
+
+  await t.test('e\' la media delle giornate in cui hai studiato', () => {
+    // I giorni a zero non contano: chi salta una settimana non deve ritrovarsi
+    // una media dimezzata e mostri piu' grossi al rientro.
+    assert.equal(averageCards(storia(100, 0, 0, 200)), 150);
+  });
+
+  await t.test('un solo giorno basta', () => {
+    assert.equal(averageCards(storia(80)), 80);
+  });
+
+  await t.test('nessuna giornata attiva vale come nessuno storico', () => {
+    assert.equal(averageCards(storia(0, 0, 0)), 0);
   });
 });

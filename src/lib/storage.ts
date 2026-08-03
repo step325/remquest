@@ -16,6 +16,7 @@ import { type Wallet, normalizeWallet } from './wallet';
 import type { Exam } from './exams';
 import { normalizeDayState, normalizeStreakState } from './state';
 import { todayKey } from './dates';
+import { MONSTER_COUNT, type Monster, TIERS, monsterForDay } from './bestiary';
 
 /** Stato del giorno corrente (sincronizzato tra dispositivi) */
 export const KEY_DAY = 'rq_day';
@@ -69,7 +70,7 @@ export async function readLang(plugin: RNPlugin): Promise<Lang> {
  * senza questo controllo resterebbe in cache finche' l'utente non lo azzera a
  * mano (e' successo con i 3003 HP del conteggio via `card.getAll()`).
  */
-export const BOSS_FORMAT = 4;
+export const BOSS_FORMAT = 5;
 
 /** Ultimo conteggio noto dei punti vita del boss di oggi */
 export interface BossState {
@@ -85,6 +86,14 @@ export interface BossState {
   cardsPlanned: number;
   /** Card scadute in tutto: il boss ne affronta solo la fetta di oggi */
   backlog: number;
+  /**
+   * Chi si affronta oggi, deciso una volta sola.
+   *
+   * Sta qui e non nei widget perche' la scelta guarda la media dello storico:
+   * farla ricalcolare a pannello e HUD significherebbe due letture in piu' e,
+   * peggio, due mostri diversi se la media cambia mentre la coda e' aperta.
+   */
+  monster: Monster;
 }
 
 export const freshBossState = (day: string = todayKey()): BossState => ({
@@ -93,6 +102,7 @@ export const freshBossState = (day: string = todayKey()): BossState => ({
   remaining: null,
   maxHp: 0,
   cardsPlanned: 0,
+  monster: monsterForDay(day, 0, 0),
   backlog: 0,
 });
 
@@ -113,7 +123,18 @@ export function normalizeBossState(value: unknown, fallbackDay: string = todayKe
     cardsPlanned:
       typeof p.cardsPlanned === 'number' && Number.isFinite(p.cardsPlanned) ? p.cardsPlanned : 0,
     backlog: typeof p.backlog === 'number' && Number.isFinite(p.backlog) ? p.backlog : 0,
+    monster: normalizeMonster(p.monster, base.monster),
   };
+}
+
+/** Il mostro scritto nello stato, se e' ancora uno di quelli che esistono */
+function normalizeMonster(value: unknown, fallback: Monster): Monster {
+  if (!value || typeof value !== 'object') return fallback;
+  const p = value as Record<string, unknown>;
+  const tier = TIERS.find((t) => t === p.tier);
+  if (!tier) return fallback;
+  const index = typeof p.index === 'number' && Number.isFinite(p.index) ? Math.floor(p.index) : -1;
+  return index >= 0 && index < MONSTER_COUNT[tier] ? { tier, index } : fallback;
 }
 
 /** Esito dell'ultima lettura degli esami */
