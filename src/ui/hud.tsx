@@ -112,12 +112,22 @@ export function Companion({
   hitSeq,
   mood,
   title,
+  atChest = false,
   scale = 2,
 }: {
   id: string;
   hitSeq: number;
   mood: Mood;
   title?: string;
+  /**
+   * Il boss e' caduto e al suo posto c'e' lo scrigno.
+   *
+   * Prima il compagno sparise: lo scrigno era il protagonista e lui era di
+   * troppo. Ma un compagno che si smaterializza nel momento migliore della
+   * giornata e' il contrario di uno che ti tiene compagnia — cosi' invece ci
+   * saltella incontro, e la vittoria e' di tutti e due.
+   */
+  atChest?: boolean;
   /** Quanti pixel di schermo per pixel di sprite */
   scale?: number;
 }) {
@@ -127,7 +137,7 @@ export function Companion({
   // Lo stato lo raccontano un accessorio e il modo di muoversi, non un disegno
   // diverso per ognuno: due sprite condivisi invece di ventiquattro.
   return (
-    <span className={`rq-pet-wrap is-${mood}`} title={title}>
+    <span className={`rq-pet-wrap is-${mood}${atChest ? ' is-at-chest' : ''}`} title={title}>
       {mood === 'asleep' && (
         <span className="rq-pet-zzz" aria-hidden="true">
           <PixelSprite sprite={ZZZ} scale={1} />

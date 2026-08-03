@@ -136,15 +136,17 @@ function QueueHud() {
         <div className="rq-hud-boss">
           {/* Compagno e mostro stanno sullo stesso pavimento, uno di fronte
               all'altro: cosi' la striscia racconta un duello invece di avere
-              una decorazione appiccicata in fondo. Il compagno sparisce a boss
-              abbattuto, dove il protagonista e' lo scrigno. */}
+              una decorazione appiccicata in fondo. Quando il boss cade il
+              compagno resta e saltella verso lo scrigno — il momento migliore
+              della giornata e' l'ultimo in cui dovrebbe sparire. */}
           <div className="rq-hud-floor">
-            {wallet.companion !== '' && !defeated && (
+            {wallet.companion !== '' && (
               <Companion
                 id={wallet.companion}
                 hitSeq={lastCombatSeq(fx)}
                 mood={companionMood(day)}
                 title={moodLabel(t, companionMood(day), streak.currentStreak, day.queueCleared)}
+                atChest={defeated}
               />
             )}
             <BossFigure hitSeq={lastCombatSeq(fx)} defeated={defeated} monster={monster} />
