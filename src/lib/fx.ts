@@ -22,12 +22,32 @@ export const FX_KINDS = [
   'halfway',
   'streak',
   'feat',
+  'recap',
 ] as const;
 
 export type FxKind = (typeof FX_KINDS)[number];
 
 /** Gli effetti che fanno avanzare la combo: sono i colpi veri al boss */
 const COMBAT_KINDS: ReadonlySet<string> = new Set<FxKind>(['hit', 'crit']);
+
+/**
+ * Gli effetti che si disegnano come numero sopra il boss.
+ *
+ * Non tutti: gli altri portano un `damage` che non e' il colpo appena messo a
+ * segno — `halfway` ci mette il danno totale della giornata e `bossdown` i punti
+ * vita del mostro intero. Disegnandoli, a metà battaglia compariva un
+ * «-340 +5 XP» che non corrispondeva a niente di quello che era appena
+ * successo, e quel +5 erano monete.
+ *
+ * La serie interrotta ne fa parte: e' l'unica cosa accaduta a quella card, e va
+ * detta dove si sta guardando.
+ */
+const POPUP_KINDS: ReadonlySet<string> = new Set<FxKind>(['hit', 'crit', 'miss']);
+
+/** Se questo effetto va disegnato sopra il boss */
+export function isPopupFx(kind: string): boolean {
+  return POPUP_KINDS.has(kind);
+}
 
 export interface FxEvent {
   /** Numero di sequenza globale, crescente */

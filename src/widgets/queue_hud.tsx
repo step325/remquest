@@ -23,6 +23,7 @@ import {
   type FxEvent,
   type FxState,
   freshFxState,
+  isPopupFx,
   lastCombatSeq,
   normalizeFxState,
   recentFx,
@@ -68,7 +69,11 @@ function useDamagePopups(fx: FxState) {
   latest.current = fx;
 
   useEffect(() => {
-    const fresh = recentFx(latest.current, seen.current, Date.now());
+    // Solo quelli che sono un colpo: gli altri portano numeri che non c'entrano
+    // con la card appena fatta (vedi `isPopupFx`).
+    const fresh = recentFx(latest.current, seen.current, Date.now()).filter((e) =>
+      isPopupFx(e.kind)
+    );
     seen.current = latest.current.seq;
     if (fresh.length === 0) return;
 

@@ -3,9 +3,11 @@ import assert from 'node:assert/strict';
 import {
   COMBO_WINDOW_MS,
   FX_BUFFER,
+  FX_KINDS,
   FX_MAX_AGE_MS,
   comboTier,
   freshFxState,
+  isPopupFx,
   lastCombatSeq,
   normalizeFxState,
   pushFx,
@@ -271,5 +273,28 @@ test('normalizeFxState', async (t) => {
     assert.equal(state.combo, 0);
     assert.equal(state.comboAt, 0);
     assert.deepEqual(state.events, []);
+  });
+});
+
+test('isPopupFx', async (t) => {
+  await t.test('sopra il boss vanno solo i colpi e la serie interrotta', () => {
+    assert.deepEqual(
+      FX_KINDS.filter(isPopupFx),
+      ['hit', 'crit', 'miss']
+    );
+  });
+
+  await t.test('gli annunci non si disegnano come danno', () => {
+    // `halfway` porta il danno di tutta la giornata e `bossdown` i punti vita
+    // del mostro intero: disegnati come numero sopra il boss facevano comparire
+    // un «-340 +5 XP» che non era il colpo appena messo a segno — e quel +5
+    // erano monete.
+    for (const kind of ['halfway', 'bossdown', 'levelup', 'mission', 'streak', 'feat', 'recap'] as const) {
+      assert.equal(isPopupFx(kind), false, kind);
+    }
+  });
+
+  await t.test('un tipo inventato non finisce a schermo', () => {
+    assert.equal(isPopupFx('boh'), false);
   });
 });
