@@ -11,7 +11,9 @@
 
 import { renderWidget, useLocalStorageState, useSyncedStorageState } from '@remnote/plugin-sdk';
 import { type FxEvent, type FxKind, freshFxState, normalizeFxState } from '../lib/fx';
-import { KEY_FX, KEY_LANG } from '../lib/storage';
+import { KEY_FX, KEY_LANG, KEY_WALLET } from '../lib/storage';
+import { freshWallet, normalizeWallet } from '../lib/wallet';
+import { companionSprite } from '../ui/companions';
 import {
   AUTO_LANG,
   type StringKey,
@@ -31,6 +33,7 @@ const ANNOUNCED: Partial<Record<FxKind, StringKey>> = {
   halfway: 'toast.halfway',
   streak: 'toast.streak',
   feat: 'toast.feat',
+  recap: 'toast.recap',
 };
 
 /** L'ultimo evento da annunciare presente nell'anello */
@@ -41,9 +44,15 @@ function lastAnnounced(events: readonly FxEvent[]): FxEvent | null {
   return null;
 }
 
-function icon(event: FxEvent) {
+function icon(event: FxEvent, companion: string) {
   if (event.kind === 'bossdown') return <PixelSprite sprite={CHEST_OPEN} scale={3} />;
   if (event.kind === 'streak') return <PixelAnim frames={FLAME} frameMs={220} scale={3} />;
+  // Il riepilogo di chiusura parla della giornata passata insieme: se un
+  // compagno c'e', l'icona e' lui, non una scintilla qualunque.
+  if (event.kind === 'recap') {
+    const pet = companionSprite(companion, 'happy');
+    if (pet) return <PixelSprite sprite={pet} scale={3} />;
+  }
   return <PixelSprite sprite={SPARK} scale={3} />;
 }
 
@@ -60,6 +69,10 @@ function message(t: Translate, event: FxEvent): string {
       return t('toast.halfwayBody', { n: event.amount });
     case 'feat':
       return event.label ?? t('toast.milestone');
+    case 'recap':
+      // La frase la compone il motore, che ha in mano giornata e compagno; qui
+      // resta il ripiego per un evento scritto senza.
+      return event.label ?? t('toast.recapAlone', { n: event.amount });
     default:
       // Il premio va detto: una missione che si completa senza dire cosa ha
       // fruttato sembra ancora una decorazione.
@@ -72,13 +85,14 @@ function message(t: Translate, event: FxEvent): string {
 function Toast() {
   const [rawFx] = useLocalStorageState(KEY_FX, freshFxState());
   const [rawLang] = useSyncedStorageState<string>(KEY_LANG, AUTO_LANG);
+  const [rawWallet] = useSyncedStorageState(KEY_WALLET, freshWallet());
   const t = translator(resolveLang(rawLang, appLocale()));
   const event = lastAnnounced(normalizeFxState(rawFx).events);
   if (!event) return null;
 
   return (
     <div className="px rq-toast px-frame">
-      <span className="rq-toast-icon">{icon(event)}</span>
+      <span className="rq-toast-icon">{icon(event, normalizeWallet(rawWallet).companion)}</span>
       <span className="rq-toast-body">
         <span className="rq-toast-title">{t(ANNOUNCED[event.kind]!)}</span>
         <span className="rq-toast-text">{message(t, event)}</span>

@@ -164,6 +164,10 @@ export const EN: Record<keyof typeof IT, string> = {
   'toast.milestone': 'Milestone reached',
   'toast.completed': 'Completed',
   'toast.completedXp': '{a} · +{b} XP',
+  'toast.recap': 'SESSION OVER',
+  'toast.recapAlone': '{n} hits today',
+  'toast.recapWith': 'You and {a}: {b} hits today',
+  'toast.recapBossDown': ' · boss down',
 
   // --- Settings inside the panel ---
   'settings.section': 'Settings',

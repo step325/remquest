@@ -162,6 +162,10 @@ export const IT = {
   'toast.milestone': 'Traguardo raggiunto',
   'toast.completed': 'Completata',
   'toast.completedXp': '{a} · +{b} XP',
+  'toast.recap': 'FINE SESSIONE',
+  'toast.recapAlone': '{n} colpi oggi',
+  'toast.recapWith': 'Tu e {a}: {b} colpi oggi',
+  'toast.recapBossDown': ' · boss abbattuto',
 
   // --- Impostazioni dentro il pannello ---
   'settings.section': 'Impostazioni',

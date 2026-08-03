@@ -47,6 +47,8 @@ import {
 import { newlyEarned, type Totals } from './feats';
 import { withDay } from './history';
 import { COINS_PER_BOSS, COINS_PER_FEAT, earn, missionCoins } from './wallet';
+import { itemById, itemNameKey } from './shop';
+import { recapBody, recapFor } from './recap';
 import { Notifier } from './notifier';
 import { translator } from './i18n/index';
 
@@ -298,10 +300,46 @@ export function startEngine(plugin: RNPlugin): () => void {
       await writeHistory(plugin, withDay(history, day));
     });
 
+  /**
+   * Il riepilogo di chiusura.
+   *
+   * Le card gia' raccontate stanno in memoria e non nello storage: entrare e
+   * uscire dalla coda tre volte di fila deve dare un annuncio, non tre, ma un
+   * riepilogo perso al riavvio del plugin non manca a nessuno.
+   *
+   * Il giorno fa parte del segno: a mezzanotte le card ripartono da zero, e
+   * senza confrontare la data il primo riepilogo del giorno nuovo non
+   * arriverebbe mai.
+   */
+  let recapShown = { day: '', cards: 0 };
+
+  const announceRecap = () =>
+    serialize(async () => {
+      const day = await currentDay();
+      const gia = recapShown.day === day.dayKey ? recapShown.cards : 0;
+      const recap = recapFor(day, gia);
+      if (!recap) return;
+      recapShown = { day: day.dayKey, cards: recap.cards };
+
+      const t = translator(await readLang(plugin));
+      const wallet = await readWallet(plugin);
+      // Un identificativo che non e' in catalogo non ha un nome da mostrare:
+      // senza questo controllo comparirebbe la chiave del dizionario.
+      const petName = itemById(wallet.companion) ? t(itemNameKey(wallet.companion)) : '';
+
+      await emitNow({
+        kind: 'recap',
+        amount: recap.cards,
+        label: recapBody(t, recap, petName),
+      });
+      notifier.now();
+    });
+
   const onQueueExit = () => {
     void recordHistory();
     void refreshExams(plugin);
     void planBoss();
+    void announceRecap();
   };
 
   plugin.event.addListener(AppEvents.QueueCompleteCard, undefined, onCompleteCard);
