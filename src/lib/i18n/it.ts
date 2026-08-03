@@ -154,6 +154,7 @@ export const IT = {
   'toast.feat': 'IMPRESA',
   'toast.streakDays': '{n} giorni di fila',
   'toast.halfwayBody': 'Il boss è a metà · +{n} monete',
+  'toast.tokenSpent': 'gettone speso',
   'toast.goalReached': 'Obiettivo di oggi raggiunto',
   'toast.milestone': 'Traguardo raggiunto',
   'toast.completed': 'Completata',

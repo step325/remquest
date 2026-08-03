@@ -156,6 +156,7 @@ export const EN: Record<keyof typeof IT, string> = {
   'toast.feat': 'DEED',
   'toast.streakDays': '{n} day streak',
   'toast.halfwayBody': 'The boss is halfway down · +{n} coins',
+  'toast.tokenSpent': 'streak token spent',
   'toast.goalReached': 'Today\'s goal reached',
   'toast.milestone': 'Milestone reached',
   'toast.completed': 'Completed',

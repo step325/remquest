@@ -245,10 +245,11 @@ export function startEngine(plugin: RNPlugin): () => void {
       // Se un gettone e' stato speso va detto: una serie che continua dopo un
       // giorno saltato, senza spiegazione, sembra un errore di conteggio.
       const salvata = updated.tokens < streak.tokens;
+      const t = translator(await readLang(plugin));
       await emitNow({
         kind: 'streak',
         amount: updated.currentStreak,
-        label: salvata ? 'gettone speso' : undefined,
+        label: salvata ? t('toast.tokenSpent') : undefined,
       });
       notifier.now();
       await bumpTotals((t) => ({ ...t, bestStreak: Math.max(t.bestStreak, updated.bestStreak) }));

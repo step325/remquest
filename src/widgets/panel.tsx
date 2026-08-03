@@ -22,6 +22,7 @@ import { TabBar, validTab, type TabId } from '../ui/tabs';
 import { SettingsPanel } from '../ui/settings_panel';
 import { HistoryStrip } from '../ui/history_strip';
 import { BestiaryGrid } from '../ui/bestiary_grid';
+import { freshFxState } from '../lib/fx';
 import { levelProgress } from '../lib/levels';
 import { companionMood, moodLabel } from '../lib/mood';
 import {
@@ -38,6 +39,7 @@ import {
   KEY_DAY,
   KEY_STREAK,
   KEY_BOSS,
+  KEY_FX,
   KEY_EXAMS,
   KEY_COLLECTION,
   KEY_TOTALS,
@@ -71,6 +73,7 @@ function Panel() {
   const [rawDay, setDay] = useSyncedStorageState<DayState>(KEY_DAY, freshDayState(today));
   const [rawStreak, setStreak] = useSyncedStorageState<StreakState>(KEY_STREAK, freshStreakState());
   const [rawBoss, setBoss] = useLocalStorageState(KEY_BOSS, freshBossState(today));
+  const [, setFx] = useLocalStorageState(KEY_FX, freshFxState());
   const [rawExams] = useLocalStorageState(KEY_EXAMS, freshExamsState());
   const [rawCollection, setCollection] = useSyncedStorageState(KEY_COLLECTION, freshCollection());
   const [rawTotals, setTotals] = useSyncedStorageState(KEY_TOTALS, freshTotals());
@@ -128,6 +131,10 @@ function Panel() {
     setTotals(freshTotals());
     setHistory(freshHistory());
     setBoss(freshBossState(today));
+    // Anche il canale degli effetti: dentro ci sono la combo in corso e
+    // l'ultimo evento annunciato, che senza questo sopravviverebbero
+    // all'azzeramento e ricomparirebbero nell'HUD.
+    setFx(freshFxState());
   };
   const t = translator(lang);
   const tab = validTab(rawTab);
