@@ -76,8 +76,11 @@ export function ShopPanel({
 }) {
   return (
     <>
+      {/* Niente "prossimo sblocco" qui: in vetrina i prezzi ci sono gia' tutti,
+          e ripetere quello piu' vicino sopra l'elenco che lo contiene e' una
+          riga che non aggiunge niente. Nel Diario invece serve, perche' li' il
+          negozio non si vede. */}
       <div className="rq-coins">{t('shop.coins', { n: wallet.coins.toLocaleString() })}</div>
-      <NextUnlock wallet={wallet} t={t} />
       <ul className="rq-shop">
         {CATALOG.map((item) => {
           const refusal = refusalFor(item, wallet, tokens, maxTokens);
