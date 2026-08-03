@@ -12,20 +12,36 @@
  * gonfierebbe solo i numeri, togliendo peso a ogni singola card.
  */
 
+/*
+ * Il ritmo del negozio.
+ *
+ * Una giornata perfetta paga trentacinque monete: tre missioni, il premio del
+ * gruppo, la meta' del boss e il boss abbattuto. Il pezzo piu' economico ne
+ * costa 250, quindi il primo acquisto arriva dopo una settimana buona e il
+ * catalogo intero dopo tre mesi e mezzo.
+ *
+ * E' lento di proposito. Poter comprare il secondo giorno svuoterebbe il
+ * negozio prima che il ripasso diventi un'abitudine, e l'abitudine e' il
+ * punto: un premio raggiunto in due sere non fa tornare nessuno la terza.
+ *
+ * I numeri stanno in scala fra loro e un test li tiene fermi: alzarne uno
+ * accorcia tutto il gioco, e va fatto sapendolo.
+ */
+
 /** Monete per una missione giornaliera completata */
-export const COINS_PER_MISSION = 10;
+export const COINS_PER_MISSION = 5;
 
 /** Monete per aver completato tutte le missioni del giorno */
-export const COINS_ALL_MISSIONS = 25;
+export const COINS_ALL_MISSIONS = 10;
 
 /** Monete per aver portato il boss a meta' punti vita */
-export const COINS_HALFWAY = 15;
+export const COINS_HALFWAY = 5;
 
 /** Monete per un boss abbattuto */
-export const COINS_PER_BOSS = 25;
+export const COINS_PER_BOSS = 5;
 
-/** Monete per un'impresa sbloccata */
-export const COINS_PER_FEAT = 50;
+/** Monete per un'impresa sbloccata: sono dodici in tutto, e non tornano */
+export const COINS_PER_FEAT = 25;
 
 export interface Wallet {
   /** Monete disponibili */

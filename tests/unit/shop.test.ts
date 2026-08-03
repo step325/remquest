@@ -13,7 +13,15 @@ import {
 } from '../../src/lib/shop';
 import { EN } from '../../src/lib/i18n/en';
 import { IT } from '../../src/lib/i18n/it';
-import { freshWallet, earn, missionCoins, normalizeWallet } from '../../src/lib/wallet';
+import {
+  COINS_HALFWAY,
+  COINS_PER_BOSS,
+  COINS_PER_MISSION,
+  freshWallet,
+  earn,
+  missionCoins,
+  normalizeWallet,
+} from '../../src/lib/wallet';
 import { MAX_STREAK_TOKENS } from '../../src/lib/gamification';
 import { MISSIONS_PER_DAY } from '../../src/lib/missions';
 import { COMPANIONS, companionSprite } from '../../src/ui/companions';
@@ -253,5 +261,44 @@ test('nextUnlock', async (t) => {
     const next = nextUnlock(w);
     assert.ok(next, 'non deve restare senza obiettivi');
     assert.equal(next.item.kind, 'token');
+  });
+});
+
+test('il ritmo del negozio', async (t) => {
+  // Una giornata perfetta: le tre missioni, il premio del gruppo, la meta' del
+  // boss e il boss abbattuto. Le imprese non contano: sono dodici in tutto e
+  // finiscono.
+  const giornataPiena =
+    missionCoins(MISSIONS_PER_DAY, MISSIONS_PER_DAY, MISSIONS_PER_DAY) +
+    COINS_HALFWAY +
+    COINS_PER_BOSS;
+
+  await t.test('una giornata perfetta paga trentacinque monete', () => {
+    // Il numero e' una scelta, non un caso: alzarlo accorcia tutto il gioco.
+    assert.equal(giornataPiena, 35);
+  });
+
+  await t.test('il primo acquisto costa piu' + ' di una settimana', () => {
+    // Poter comprare il secondo giorno svuoterebbe il negozio prima che il
+    // ripasso diventi un'abitudine, ed e' l'abitudine il punto.
+    const piuEconomico = Math.min(...CATALOG.map((i) => i.price));
+    assert.ok(
+      piuEconomico / giornataPiena >= 7,
+      `il pezzo piu' economico costa ${(piuEconomico / giornataPiena).toFixed(1)} giornate piene`
+    );
+  });
+
+  await t.test('il catalogo intero non si esaurisce in un mese', () => {
+    const tutto = CATALOG.filter((i) => i.kind !== 'token').reduce((n, i) => n + i.price, 0);
+    assert.ok(
+      tutto / giornataPiena >= 90,
+      `tutto il catalogo costa ${Math.round(tutto / giornataPiena)} giornate piene`
+    );
+  });
+
+  await t.test('abbattere il boss non vale meno di una missione', () => {
+    // E' il gesto che chiude la giornata: pagarlo meno di un obiettivo
+    // qualsiasi direbbe che conta meno, e non e' vero.
+    assert.ok(COINS_PER_BOSS >= COINS_PER_MISSION);
   });
 });
