@@ -24,6 +24,7 @@ import { HistoryStrip } from '../ui/history_strip';
 import { BestiaryGrid } from '../ui/bestiary_grid';
 import { freshFxState } from '../lib/fx';
 import { levelProgress } from '../lib/levels';
+import { prestigeFor, prestigeLabel } from '../lib/prestige';
 import { companionMood, moodLabel } from '../lib/mood';
 import {
   AUTO_LANG,
@@ -138,6 +139,7 @@ function Panel() {
   const t = translator(lang);
   const tab = validTab(rawTab);
   const level = levelProgress(streak.lifetimeXp);
+  const prestige = prestigeFor(level.level);
   const mood = companionMood(day);
 
   const remaining = boss.remaining;
@@ -146,9 +148,13 @@ function Panel() {
   return (
     // `px` porta palette, font e primitive condivise con l'HUD della coda:
     // le due schermate devono sembrare lo stesso gioco.
-    <div className={`px rq ${themeClass(wallet)}`.trim()}>
+    <div className={`px rq ${themeClass(wallet)} ${prestige.className}`.trim()}>
       <header className="rq-head">
-        <div>
+        {/* Il blocco del livello e' anche il posto dove si vede il prestigio:
+            le decorazioni sono roba di src/styles/panel_prestige.css, qui basta
+            un nome a cui attaccarle. Il suggerimento dice da dove arrivano —
+            una cornice comparsa da sola sembrerebbe un difetto grafico. */}
+        <div className="rq-crest" title={prestigeLabel(t, prestige) ?? undefined}>
           <div className="rq-level">{t('panel.level', { n: level.level })}</div>
           <div className="rq-title">{level.title}</div>
         </div>
@@ -172,15 +178,19 @@ function Panel() {
         </div>
       </header>
 
-      <Bar
-        percent={level.percent}
-        tone="level"
-        caption={t('panel.xpToNext', {
-          a: level.xpIntoLevel,
-          b: level.xpForNextLevel,
-          n: level.level + 1,
-        })}
-      />
+      {/* L'involucro serve alle scintille del secondo grado: `px-bar` la usano
+          anche il boss e l'HUD, e il luccichio e' del livello soltanto. */}
+      <div className="rq-level-bar">
+        <Bar
+          percent={level.percent}
+          tone="level"
+          caption={t('panel.xpToNext', {
+            a: level.xpIntoLevel,
+            b: level.xpForNextLevel,
+            n: level.level + 1,
+          })}
+        />
+      </div>
 
       <TabBar active={tab} onPick={setTab} t={t} />
 

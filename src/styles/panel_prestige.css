@@ -1,0 +1,119 @@
+/*
+ * Prestigio: le decorazioni dei livelli alti.
+ *
+ * Quali gradi esistono e quando arrivano lo decide src/lib/prestige.ts, che
+ * mette una sola classe (`rq-prestige-1|2|3`) sul contenitore del pannello.
+ * Qui c'e' solo il come si vedono — nessuna regola tocca misure o posizioni del
+ * resto del pannello, e chi non ha sbloccato niente non riceve nessuna classe.
+ *
+ * I gradi sono cumulativi: le regole del primo valgono anche per il secondo e
+ * per il terzo, e per questo ogni selettore li elenca. Piu' lungo di un
+ * `[class*=]`, ma si legge che cosa vede chi ha quel grado.
+ */
+
+/* --- Grado 1 (livello 10): la cornice attorno al nome --- */
+
+/*
+ * I margini negativi valgono i pixel del bordo: la cornice cresce verso fuori e
+ * il numero del livello resta allineato con tutto il resto del pannello. Senza,
+ * sbloccare il grado sposterebbe il testo di qualche pixel a destra — un premio
+ * non deve far muovere le cose che c'erano prima.
+ */
+.rq-prestige-1 .rq-crest,
+.rq-prestige-2 .rq-crest,
+.rq-prestige-3 .rq-crest {
+  /* I margini valgono il riempimento *piu'* il bordo: solo cosi' il testo resta
+     dove era. Con il bordo non contato si sposta di due pixel, che a questa
+     scala si vedono. */
+  margin: calc(var(--px-unit) * -4) 0 0 calc(var(--px-unit) * -5);
+  padding: calc(var(--px-unit) * 3) calc(var(--px-unit) * 4);
+  background: var(--px-panel);
+  border: var(--px-unit) solid var(--px-line);
+  /* Gli stessi tre strati netti della cornice di gioco (vedi .px-frame):
+     nero fuori, bordo, rialzo dentro. */
+  box-shadow:
+    0 0 0 var(--px-unit) var(--px-void),
+    inset 0 0 0 var(--px-unit) var(--px-panel-up);
+}
+
+/* --- Grado 2 (livello 20): le scintille sulla barra del livello --- */
+
+.rq-prestige-2 .rq-level-bar .px-bar-fill,
+.rq-prestige-3 .rq-level-bar .px-bar-fill {
+  position: relative;
+}
+
+/*
+ * Due file di pixel chiari che scorrono in direzioni opposte, a passo diverso.
+ * Da vicino sono scintille, da lontano un luccichio che percorre la barra.
+ *
+ * Stanno sul riempimento e non sulla barra: cosi' compaiono solo sulla parte
+ * guadagnata e si fermano dove si e' arrivati, invece di brillare anche sul
+ * vuoto che resta da fare.
+ */
+.rq-prestige-2 .rq-level-bar .px-bar-fill::after,
+.rq-prestige-3 .rq-level-bar .px-bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(90deg, var(--px-light) 0 var(--px-unit), transparent var(--px-unit)),
+    linear-gradient(90deg, var(--px-light) 0 var(--px-unit), transparent var(--px-unit));
+  background-repeat: repeat-x, repeat-x;
+  /* Passi primi fra loro: le due file non si riallineano mai, quindi il
+     luccichio non diventa un motivo che si riconosce. */
+  background-size:
+    calc(var(--px-unit) * 7) var(--px-unit),
+    calc(var(--px-unit) * 11) var(--px-unit);
+  /* Il riempimento e' alto tre pixel logici (dieci meno i bordi): le due file
+     stanno sulla prima e sulla terza, cosi' restano separate e dentro. Piu' in
+     basso la seconda finirebbe tagliata e resterebbe un tratteggio regolare. */
+  background-position: 0 0, 0 calc(var(--px-unit) * 2);
+  opacity: 0.8;
+  /* A scatti come tutto il resto: il movimento fluido a questa scala sfuma i
+     pixel e li fa sembrare sporco. */
+  animation: rq-prestige-spark 900ms steps(7, end) infinite;
+  pointer-events: none;
+}
+
+@keyframes rq-prestige-spark {
+  from {
+    background-position: 0 0, 0 calc(var(--px-unit) * 2);
+  }
+  to {
+    background-position:
+      calc(var(--px-unit) * 7) 0,
+      calc(var(--px-unit) * -11) calc(var(--px-unit) * 2);
+  }
+}
+
+/* --- Grado 3 (livello 30): l'oro --- */
+
+.rq-prestige-3 .rq-crest {
+  border-color: var(--px-gold-dark);
+  box-shadow:
+    0 0 0 var(--px-unit) var(--px-void),
+    inset 0 0 0 var(--px-unit) var(--px-gold);
+}
+
+/* Il titolo passa dal viola del livello all'oro delle cose che restano —
+   la stessa tinta delle imprese e degli XP di sempre. */
+.rq-prestige-3 .rq-crest .rq-title {
+  color: var(--px-gold);
+}
+
+.rq-prestige-3 .rq-level-bar .px-bar-fill::after {
+  background-image:
+    linear-gradient(90deg, var(--px-gold) 0 var(--px-unit), transparent var(--px-unit)),
+    linear-gradient(90deg, var(--px-light) 0 var(--px-unit), transparent var(--px-unit));
+  opacity: 1;
+}
+
+/* Chi ha chiesto meno animazioni al sistema operativo tiene le scintille, ma
+   ferme: la decorazione resta, il movimento no. */
+@media (prefers-reduced-motion: reduce) {
+  .rq-prestige-2 .rq-level-bar .px-bar-fill::after,
+  .rq-prestige-3 .rq-level-bar .px-bar-fill::after {
+    animation: none;
+  }
+}
