@@ -1,6 +1,7 @@
 /** Pezzi di UI del Remquest. Gli stili stanno in src/App.css. */
 
 import type { ReactNode } from 'react';
+import type { Translate } from '../lib/i18n/index';
 
 export type Tone = 'level' | 'boss' | 'done' | 'xp' | 'cards' | 'streak' | 'best';
 
@@ -65,14 +66,16 @@ export function ExamRow({
   countdown,
   urgent,
   dailyGoal,
+  t,
 }: {
   name: string;
   dateText: string;
   countdown: string;
   urgent: boolean;
   dailyGoal?: number;
+  t: Translate;
 }) {
-  const goal = dailyGoal ? ` · ${dailyGoal} card al giorno` : '';
+  const goal = dailyGoal ? ` · ${t('exams.dailyGoal', { n: dailyGoal })}` : '';
   return (
     <li className={`rq-exam${urgent ? ' is-urgent' : ''}`}>
       <div className="rq-exam-body">

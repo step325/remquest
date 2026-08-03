@@ -133,6 +133,9 @@ export const EN: Record<keyof typeof IT, string> = {
   'mood.days': ' · with you for {n} days',
   'mood.bosses': ' · has seen {n} bosses fall',
 
+  // --- Prestige ---
+  'prestige.badge': 'Prestige {n} · since level {a}',
+
   // --- Queue HUD ---
   'hud.boss': 'Boss of the day',
   'hud.bossDown': 'Boss down',

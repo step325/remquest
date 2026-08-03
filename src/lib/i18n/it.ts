@@ -131,6 +131,9 @@ export const IT = {
   'mood.days': ' · ti segue da {n} giorni',
   'mood.bosses': ' · ha visto cadere {n} boss',
 
+  // --- Prestigio ---
+  'prestige.badge': 'Prestigio {n} · dal livello {a}',
+
   // --- HUD della coda ---
   'hud.boss': 'Boss del giorno',
   'hud.bossDown': 'Boss sconfitto',

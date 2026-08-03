@@ -244,6 +244,7 @@ function Panel() {
                 countdown={countdownLabel(t, exam.daysLeft)}
                 urgent={exam.daysLeft !== null && exam.daysLeft <= 7}
                 dailyGoal={exam.dailyGoal}
+                t={t}
               />
             ))}
           </ul>
