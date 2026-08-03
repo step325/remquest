@@ -1,0 +1,209 @@
+/*
+ * Fondamenta dello stile pixel: font, palette, cornici, barre.
+ *
+ * Questo file non si carica da solo. L'SDK inietta nei widget un solo
+ * <link href="App.css">, quindi tutto arriva da li' via @import: css-loader
+ * risolve gli @import in fase di build e ne esce un unico foglio.
+ *
+ * I colori sono gli stessi di src/ui/palette.ts, nello stesso ordine. Se ne
+ * cambi uno, cambialo anche li': gli sprite e le barre devono restare in tinta.
+ */
+
+/* I font sono copiati da public/fonts/ dentro dist/ e citati con percorso
+   relativo: il plugin gira in un iframe sandbox, una richiesta a un CDN
+   esterno non e' detto che passi. Entrambi sono sotto licenza OFL, il testo
+   sta accanto ai file. */
+
+@font-face {
+  font-family: 'Press Start 2P';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../fonts/press-start-2p-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Press Start 2P';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../fonts/press-start-2p-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F;
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../fonts/silkscreen-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url('../fonts/silkscreen-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F;
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+  src: url('../fonts/silkscreen-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/silkscreen-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F;
+}
+
+.px {
+  --px-void: #0b0f1a;
+  --px-panel: #17203a;
+  --px-panel-up: #232f52;
+  --px-line: #3d4d7a;
+  --px-dim: #8794b8;
+  /* Per il testo secondario che si legge davvero: --px-dim va bene per le
+     etichette brevi, ma su una frase intera a corpo piccolo affatica. */
+  --px-soft: #b3bdd8;
+  --px-ink: #e8ecf5;
+  --px-light: #ffffff;
+  --px-gold: #ffcc44;
+  --px-gold-dark: #c98c1e;
+  --px-blood: #d1344a;
+  --px-blood-dark: #8a1c30;
+  --px-leaf: #4ad66d;
+  --px-leaf-dark: #2a8f45;
+  --px-sky: #4fc3f7;
+  --px-flame: #ff8a3d;
+  --px-mana: #b06bff;
+  /* La meta' bassa della barra del livello. Era scritta a mano dentro la
+     regola, e restava viola anche sotto i temi che di viola non ne hanno. */
+  --px-mana-dark: #7c3ad6;
+  /* Le tacche delle barre. Vanno con il fondo, non con il tema di partenza:
+     scure su un fill chiaro, chiare su un fill scuro. */
+  --px-notch: rgba(11, 15, 26, 0.55);
+
+  --px-title: 'Press Start 2P', ui-monospace, monospace;
+  --px-body: 'Silkscreen', ui-monospace, monospace;
+
+  /* Lato del pixel logico: tutte le misure sono suoi multipli, altrimenti i
+     bordi cadono a meta' pixel e sfumano. */
+  --px-unit: 2px;
+
+  box-sizing: border-box;
+  color: var(--px-ink);
+  font-family: var(--px-body);
+  /* Il testo pixel non va antialiasato: i bordi devono restare duri. */
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+}
+
+.px *,
+.px *::before,
+.px *::after {
+  box-sizing: inherit;
+}
+
+/* --- Cornice della finestra di gioco --- */
+
+.px-frame {
+  background: var(--px-panel);
+  border: var(--px-unit) solid var(--px-line);
+  border-radius: 0;
+  /* Tre strati netti: nero fuori, bordo, rialzo dentro. Nessuna ombra
+     sfumata, che a questa scala sembrerebbe sporco. */
+  box-shadow:
+    0 0 0 var(--px-unit) var(--px-void),
+    inset 0 0 0 var(--px-unit) var(--px-panel-up);
+}
+
+/* --- Testo --- */
+
+.px-label {
+  font-family: var(--px-title);
+  font-size: 8px;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: var(--px-dim);
+  text-transform: uppercase;
+}
+
+.px-value {
+  font-family: var(--px-title);
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--px-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Contorno duro, per il testo che sta sopra gli sprite */
+.px-outline {
+  text-shadow:
+    2px 0 0 var(--px-void),
+    -2px 0 0 var(--px-void),
+    0 2px 0 var(--px-void),
+    0 -2px 0 var(--px-void);
+}
+
+/* --- Barre a segmenti --- */
+
+.px-bar {
+  position: relative;
+  height: calc(var(--px-unit) * 5);
+  background: var(--px-void);
+  border: var(--px-unit) solid var(--px-line);
+  overflow: hidden;
+}
+
+.px-bar-fill {
+  height: 100%;
+  /* A scatti, non fluida: il riempimento avanza per tacche come una barra HP
+     di un gioco a 16 bit. */
+  transition: width 0.35s steps(12, end);
+}
+
+/* Le tacche sono disegnate sopra il riempimento, non sotto: cosi' restano
+   visibili anche a barra piena. */
+.px-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(var(--px-unit) * 5),
+    var(--px-notch) calc(var(--px-unit) * 5),
+    var(--px-notch) calc(var(--px-unit) * 6)
+  );
+  pointer-events: none;
+}
+
+.px-fill-level {
+  background: linear-gradient(180deg, var(--px-mana) 50%, var(--px-mana-dark) 50%);
+}
+.px-fill-hp {
+  background: linear-gradient(180deg, var(--px-blood) 50%, var(--px-blood-dark) 50%);
+}
+.px-fill-xp {
+  background: linear-gradient(180deg, var(--px-gold) 50%, var(--px-gold-dark) 50%);
+}
+.px-fill-done {
+  background: linear-gradient(180deg, var(--px-leaf) 50%, var(--px-leaf-dark) 50%);
+}

@@ -1,0 +1,335 @@
+/*
+ * Missioni giornaliere, pulsanti e diagnostica del pannello.
+ *
+ * Sta in un file a parte solo per non superare le duecento righe: sono gli
+ * stessi stili del pannello e valgono le stesse regole (palette a 16 colori,
+ * spigoli vivi, font a pixel).
+ */
+
+.rq-mission {
+  align-items: flex-start;
+}
+
+/* Quadrata, non tonda: un cerchio a questa scala esce a scalini */
+.rq-mission-check {
+  flex: none;
+  width: calc(var(--px-unit) * 9);
+  height: calc(var(--px-unit) * 9);
+  margin-top: calc(var(--px-unit));
+  border: var(--px-unit) solid var(--px-line);
+  background: var(--px-void);
+  font-family: var(--px-title);
+  font-size: 9px;
+  line-height: calc(var(--px-unit) * 7);
+  text-align: center;
+  color: var(--px-void);
+}
+
+.rq-mission.is-done {
+  border-color: var(--px-leaf-dark);
+}
+
+.rq-mission.is-done .rq-mission-check {
+  border-color: var(--px-leaf);
+  background: var(--px-leaf);
+  color: var(--px-void);
+}
+
+.rq-mission.is-done .rq-mission-top span:first-child {
+  color: var(--px-dim);
+  text-decoration: line-through;
+}
+
+.rq-mission-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.rq-mission-top {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(var(--px-unit) * 4);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--px-ink);
+}
+
+.rq-mission-count {
+  flex: none;
+  font-family: var(--px-title);
+  font-size: 9px;
+  color: var(--px-soft);
+}
+
+.rq-mission-track {
+  height: calc(var(--px-unit) * 3);
+  margin-top: calc(var(--px-unit) * 4);
+  background: var(--px-void);
+  border: var(--px-unit) solid var(--px-line);
+}
+
+.rq-mission-fill {
+  height: 100%;
+  background: var(--px-leaf);
+  transition: width 0.35s steps(10, end);
+}
+
+/* --- Pulsanti --- */
+
+.rq-button {
+  padding: calc(var(--px-unit) * 3) calc(var(--px-unit) * 5);
+  border: var(--px-unit) solid var(--px-line);
+  background: var(--px-panel);
+  color: var(--px-soft);
+  font-family: var(--px-title);
+  font-size: 9px;
+  cursor: pointer;
+  transition: color 0.1s steps(2, end);
+}
+
+.rq-button:hover:not(:disabled) {
+  color: var(--px-gold);
+  border-color: var(--px-gold-dark);
+}
+
+.rq-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* --- Bestiario --- */
+
+.rq-bestiary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: calc(var(--px-unit) * 2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rq-bestiary-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--px-unit) * 1);
+  background: var(--px-panel);
+  border: var(--px-unit) solid var(--px-line);
+}
+
+/* Mai incontrato: la sagoma si intuisce, la creatura no */
+.rq-bestiary-cell.is-unknown {
+  background: var(--px-void);
+}
+
+/* Incontrato ma ancora in piedi */
+.rq-bestiary-cell.is-seen {
+  border-color: var(--px-dim);
+}
+
+/* Abbattuto: il bordo d'oro e' il trofeo */
+.rq-bestiary-cell.is-defeated {
+  border-color: var(--px-gold);
+  background: var(--px-panel-up);
+}
+
+.rq-bestiary-count {
+  margin-top: calc(var(--px-unit) * 4);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--px-soft);
+}
+
+/* --- Storico --- */
+
+/* Le colonnine crescono dal basso: allineate in fondo, non in cima */
+.rq-history {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: calc(var(--px-unit));
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * Una colonnina per giornata, ma con un tetto alla larghezza: nei primi giorni
+ * ce n'e' una sola, e senza limite si prendeva tutta la striscia diventando un
+ * rettangolo pieno che non somigliava a un grafico.
+ */
+.rq-history-bar {
+  flex: 1 1 0;
+  min-width: calc(var(--px-unit) * 2);
+  max-width: calc(var(--px-unit) * 6);
+}
+
+/* Boss abbattuto */
+.rq-history-bar.is-won {
+  background: var(--px-gold);
+}
+
+/* Studiato ma boss ancora in piedi */
+.rq-history-bar.is-done {
+  background: var(--px-sky);
+}
+
+/* Giornata saltata: resta un trattino, non il vuoto */
+.rq-history-bar.is-empty {
+  background: var(--px-line);
+}
+
+.rq-history-legend {
+  margin-top: calc(var(--px-unit) * 4);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--px-soft);
+}
+
+/* --- Negozio --- */
+
+.rq-coins {
+  margin-bottom: calc(var(--px-unit) * 5);
+  font-family: var(--px-title);
+  font-size: 13px;
+  color: var(--px-gold);
+}
+
+.rq-shop {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--px-unit) * 4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rq-shop-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--px-unit) * 5);
+  padding: calc(var(--px-unit) * 6) calc(var(--px-unit) * 5);
+  background: var(--px-panel);
+  border: var(--px-unit) solid var(--px-line);
+}
+
+/* Quello che si sta usando adesso */
+.rq-shop-item.is-worn {
+  border-color: var(--px-gold);
+}
+
+/*
+ * Prende tutto lo spazio fra anteprima e prezzo.
+ *
+ * Senza `flex`, il riquadro del testo e' largo quanto il testo stesso, e
+ * `space-between` distribuisce l'avanzo *fra* gli elementi: ogni riga partiva
+ * da un punto diverso a seconda di quanto era lungo il nome.
+ */
+.rq-shop-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rq-shop-name {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--px-ink);
+}
+
+.rq-shop-desc {
+  display: block;
+  margin-top: calc(var(--px-unit) * 2);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--px-soft);
+}
+
+/*
+ * Anteprima dello sprite nella riga del negozio.
+ *
+ * Larghezza fissa e contenuto centrato: gli sprite riempiono il riquadro da
+ * sedici in modo diverso — il gufo e' stretto, il tomo largo — e senza una
+ * gabbia comune il testo di ogni riga partiva da un punto diverso.
+ */
+.rq-shop-preview {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+}
+
+/* --- Impostazioni e zona pericolosa --- */
+
+/*
+ * L'etichetta sopra e i pulsanti sotto quando lo spazio non basta.
+ *
+ * In riga sola il pulsante piu' lungo («Come RemNote (Italiano)») si spezzava a
+ * meta' parola: nella barra laterale stretta e' la regola, non l'eccezione.
+ */
+.rq-settings-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--px-unit) * 3);
+  margin-bottom: calc(var(--px-unit) * 6);
+}
+
+.rq-settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--px-unit) * 2);
+}
+
+/*
+ * Il riquadro dell'azzeramento e' rosso e staccato dal resto.
+ *
+ * Non e' decorazione: e' l'unico posto del pannello dove un clic distratto
+ * cancella mesi di serie di giorni, e deve sembrare diverso da tutti gli altri
+ * prima ancora di essere letto.
+ */
+.rq-danger {
+  margin-top: calc(var(--px-unit) * 8);
+  padding: calc(var(--px-unit) * 5);
+  background: var(--px-panel);
+  border: var(--px-unit) solid var(--px-blood-dark);
+  border-left-width: calc(var(--px-unit) * 3);
+  border-left-color: var(--px-blood);
+}
+
+.rq-danger-title {
+  margin-bottom: calc(var(--px-unit) * 3);
+  font-family: var(--px-title);
+  font-size: 9px;
+  color: var(--px-blood);
+}
+
+.rq-danger-note {
+  margin: 0 0 calc(var(--px-unit) * 4);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--px-soft);
+}
+
+/* La domanda pesa piu' della premessa: dice cosa si perde, con i numeri */
+.rq-danger-ask {
+  margin: 0 0 calc(var(--px-unit) * 4);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--px-ink);
+}
+
+.rq-button.is-danger {
+  color: var(--px-blood);
+  border-color: var(--px-blood-dark);
+}
+
+.rq-button.is-danger:hover:not(:disabled) {
+  color: var(--px-light);
+  background: var(--px-blood-dark);
+  border-color: var(--px-blood);
+}

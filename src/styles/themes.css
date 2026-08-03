@@ -1,0 +1,198 @@
+/*
+ * Temi acquistabili.
+ *
+ * Un tema e' solo un altro blocco delle stesse sedici variabili definite in
+ * pixel.css: nessuna regola di layout viene toccata, quindi cambiare pelle non
+ * puo' rompere niente. La classe la mette il widget leggendo il portafoglio, e
+ * vale sia nel pannello sia nell'HUD della coda.
+ *
+ * Le tinte restano sedici anche qui: un tema con la sua tavolozza allargata
+ * sfalserebbe gli sprite, che pescano dalla stessa lista di indici.
+ */
+
+/*
+ * Game Boy: lo schermo del DMG-01, non "qualcosa di verde".
+ *
+ * I quattro toni sono quelli veri (#0f380f #306230 #8bac0f #9bbc0f) e vanno
+ * usati come li usa un LCD riflettivo: il vetro e' CHIARO e i pixel accesi
+ * sono SCURI. La versione precedente li aveva ribaltati — fondo scurissimo e
+ * scritte verdi — che e' un terminale a fosfori, non un Game Boy: si leggeva
+ * male e non somigliava a niente.
+ *
+ * Le due tinte in piu' (#1e4a14, #4a7a1e) non sono decorazione: con soli
+ * quattro toni testo, etichette e bordi finivano tutti sullo stesso, e la
+ * gerarchia spariva. Restano dentro la stessa rampa.
+ */
+.px.theme-gameboy {
+  /*
+   * Fondo e riquadri stanno a un solo gradino di distanza, non a tre: a
+   * separarli ci pensano i bordi neri, che sul DMG sono la cosa piu' netta
+   * dello schermo. Un fondo piu' cupo rendeva acido il verde e spegneva il
+   * testo che ci stava sopra.
+   */
+  --px-void: #88a80e;
+  --px-panel: #9bbc0f; /* vetro acceso */
+  --px-panel-up: #8bac0f;
+  --px-line: #0f380f; /* contorni: sul DMG sono duri e quasi neri */
+  /*
+   * Il testo secondario e' scuro quasi quanto quello principale.
+   *
+   * Con quattro toni la gerarchia si fa con il corpo e il font, non con il
+   * colore: schiarire le etichette, come si fa sui temi scuri, qui le
+   * cancellava — verde medio su verde chiaro non si legge.
+   */
+  --px-dim: #1e4a14;
+  --px-soft: #14400f;
+  --px-ink: #0f380f; /* il testo e' il pixel acceso: il tono piu' scuro */
+  --px-light: #cadc9f;
+  --px-gold: #0f380f; /* su fondo chiaro l'evidenza e' il piu' scuro, non il piu' acceso */
+  --px-gold-dark: #306230;
+  --px-blood: #1e4a14;
+  --px-blood-dark: #0f380f;
+  --px-leaf: #306230;
+  --px-leaf-dark: #1e4a14;
+  /* Restano toni medi perche' sono fasce e bordi, non testo: servono a
+     distinguere i riquadri fra loro, non a essere letti. */
+  --px-sky: #3f6b22;
+  --px-flame: #2c5a1c;
+  --px-mana: #0f380f; /* anche il sottotitolo del livello passa di qui */
+  --px-mana-dark: #306230;
+  /* Le barre si riempiono di scuro: le tacche devono essere chiare, o dentro
+     il riempimento non si vedrebbero. */
+  --px-notch: rgba(155, 188, 15, 0.5);
+  /*
+   * Gli sprite passano per questi quattro toni invece che per la palette.
+   *
+   * E' l'unico tema che la dichiara, e non e' un vezzo: un DMG i colori non li
+   * aveva, e un mostro azzurro su un pannello verde era l'unica cosa che
+   * tradiva il travestimento. Un tema a colori invece i mostri li mostra come
+   * sono disegnati: appiattirli sarebbe una perdita e basta.
+   */
+  --px-sprite-ramp: #0f380f #306230 #8bac0f #9bbc0f;
+}
+
+/*
+ * La trama dello schermo.
+ *
+ * Un LCD a matrice ha la griglia fra i pixel: una riga chiara ogni due unita'
+ * la riporta senza toccare nessuna misura, e a questa scala e' la differenza
+ * fra "verde" e "Game Boy". Vale solo qui, ed e' l'unica regola di questo
+ * foglio che non sia una variabile.
+ */
+.px.theme-gameboy.rq,
+.px.theme-gameboy .rq-hud-host {
+  background-image: repeating-linear-gradient(
+      0deg,
+      rgba(15, 56, 15, 0.09) 0,
+      rgba(15, 56, 15, 0.09) 1px,
+      transparent 1px,
+      transparent var(--px-unit)
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(15, 56, 15, 0.09) 0,
+      rgba(15, 56, 15, 0.09) 1px,
+      transparent 1px,
+      transparent var(--px-unit)
+    );
+}
+
+/*
+ * Cripta: pietra viola, candele, muffa fosforescente.
+ *
+ * Prima era viola su viola: il buio fuori dai riquadri e la pietra dentro
+ * stavano a due passi l'uno dall'altra e il pannello sembrava una macchia
+ * sola. Qui il nero della cripta e' quasi nero, la pietra si stacca, e le
+ * fughe fra i blocchi (--px-line) sono l'unica cosa accesa della stanza.
+ *
+ * Gli accenti raccontano il posto: oro di candela, sangue rappreso, muffa
+ * verde sulle pietre, fuochi fatui. Nessuno e' saturo: sotto terra non c'e'
+ * luce che basti.
+ */
+.px.theme-crypt {
+  --px-void: #090512; /* il buio oltre la torcia */
+  --px-panel: #1b1029; /* pietra */
+  --px-panel-up: #2a1a3f;
+  --px-line: #513179; /* fughe fra i blocchi */
+  --px-dim: #857298;
+  --px-soft: #b7a6cd;
+  --px-ink: #f0e8f7; /* ossa sbiancate */
+  --px-light: #ffffff;
+  --px-gold: #d8b34a; /* candelabri */
+  --px-gold-dark: #86641a;
+  --px-blood: #b0234e; /* sangue rappreso */
+  --px-blood-dark: #55102b;
+  --px-leaf: #5ecb90; /* muffa fosforescente */
+  --px-leaf-dark: #256e4a;
+  --px-sky: #8f6fe0; /* fuochi fatui */
+  --px-flame: #cd5ad6; /* fiamma spettrale */
+  --px-mana: #a86bff;
+  --px-mana-dark: #5f2fb0;
+  --px-notch: rgba(9, 5, 18, 0.6);
+}
+
+/*
+ * Fucina: ferro freddo intorno, metallo incandescente sopra.
+ *
+ * Prima era marrone su marrone e ogni accento era un arancione diverso:
+ * quattro tinte che si somigliavano non distinguevano piu' niente. Il ferro
+ * ora e' quasi grigio e tiene il fondo, cosi' la brace ha qualcosa contro cui
+ * accendersi.
+ *
+ * I due colori che sembrano fuori posto sono i piu' fedeli: il verde e' la
+ * patina del rame, il blu e' quello che prende l'acciaio temprato. Servono
+ * anche a distinguere i riquadri, che con soli aranci erano indistinguibili.
+ */
+.px.theme-forge {
+  --px-void: #120c0a; /* carbone spento */
+  --px-panel: #241b17; /* ferro */
+  --px-panel-up: #352721;
+  --px-line: #6b4128; /* ruggine sugli spigoli */
+  --px-dim: #a8836a;
+  --px-soft: #d9bda6;
+  --px-ink: #f7e8d8; /* acciaio pulito */
+  --px-light: #fff6ea;
+  --px-gold: #ffb020; /* metallo a temperatura */
+  --px-gold-dark: #a86300;
+  --px-blood: #e0431f; /* brace viva */
+  --px-blood-dark: #7d1c08;
+  --px-leaf: #5fae72; /* patina di rame */
+  --px-leaf-dark: #2f6b45;
+  --px-sky: #6f9fd8; /* azzurro dell'acciaio temprato */
+  --px-flame: #ff7a1a;
+  --px-mana: #ffcf5c; /* oro fuso */
+  --px-mana-dark: #b07a10;
+  --px-notch: rgba(18, 12, 10, 0.6);
+}
+
+/*
+ * Pergamena: fondo chiaro e inchiostro.
+ *
+ * L'unico tema che ribalta il contrasto, quindi le tinte non si limitano a
+ * cambiare: i colori accesi vanno scuriti, altrimenti su fondo chiaro
+ * scompaiono.
+ */
+.px.theme-parchment {
+  --px-void: #e8dfc8;
+  --px-panel: #f2ead6;
+  --px-panel-up: #dcd0b4;
+  --px-line: #a89574;
+  --px-dim: #7a6a52;
+  --px-soft: #5c4f3d;
+  --px-ink: #2e2519;
+  --px-light: #ffffff;
+  --px-gold: #a06a00;
+  --px-gold-dark: #6b4600;
+  --px-blood: #a32b2b;
+  --px-blood-dark: #6b1717;
+  --px-leaf: #3d7a3d;
+  --px-leaf-dark: #275027;
+  --px-sky: #2b5c8a;
+  --px-flame: #b05416;
+  --px-mana: #6b3fa0;
+  /* Le due variabili nuove: la meta' bassa della barra del livello era scritta
+     a mano in pixel.css e restava viola acceso anche qui. Il resto del tema
+     e' quello di prima. */
+  --px-mana-dark: #472a6b;
+  --px-notch: rgba(46, 37, 25, 0.35);
+}

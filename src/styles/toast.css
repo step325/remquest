@@ -1,0 +1,55 @@
+/*
+ * Avviso a pixel: la finestrella che compare per livello, missione, boss
+ * battuto e serie di giorni.
+ *
+ * Vive in un widget fluttuante, quindi occupa esattamente lo spazio che gli
+ * serve e non ha bisogno di posizionarsi da solo: dove appare lo decide chi lo
+ * apre, passando le coordinate a openFloatingWidget.
+ */
+
+.rq-toast {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px-unit) * 5);
+  padding: calc(var(--px-unit) * 6);
+  /* Entra a scatti, come tutto il resto: se scivolasse dolcemente si
+     riconoscerebbe subito che non e' un gioco a 16 bit. */
+  animation: px-toast-in 0.3s steps(5, end);
+}
+
+.rq-toast-icon {
+  flex: none;
+  display: flex;
+}
+
+.rq-toast-body {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--px-unit) * 2);
+  min-width: 0;
+}
+
+.rq-toast-title {
+  font-family: var(--px-title);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--px-gold);
+}
+
+.rq-toast-text {
+  font-family: var(--px-body);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--px-ink);
+}
+
+@keyframes px-toast-in {
+  from {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

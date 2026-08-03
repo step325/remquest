@@ -1,0 +1,340 @@
+/*
+ * Pannello del Remquest nella barra laterale.
+ *
+ * Stessa lingua dell'HUD della coda: palette a 16 colori, font a pixel,
+ * cornici a spigolo vivo, nessun raggio e nessuna ombra sfumata. Il fondo e'
+ * suo e non segue il tema di RemNote — un'interfaccia di gioco che cambia
+ * colore insieme all'applicazione smette di sembrare un gioco.
+ */
+
+/*
+ * Il pannello scorre dentro il proprio riquadro.
+ *
+ * `height` e non `min-height`: e' la differenza fra un box alto quanto la
+ * finestra e uno che si allunga oltre. Con `min-height` il contenuto piu' lungo
+ * faceva crescere il box, `overflow-y` non aveva niente da far scorrere, e
+ * RemNote non allunga l'iframe del widget — quindi tutto quello che stava sotto
+ * spariva senza modo di raggiungerlo.
+ *
+ * Dentro un iframe `100vh` e' l'altezza dell'iframe, che qui e' quella della
+ * barra laterale: e' esattamente la misura giusta.
+ */
+.rq {
+  height: 100vh;
+  overflow-y: auto;
+  padding: calc(var(--px-unit) * 10) calc(var(--px-unit) * 8)
+    calc(var(--px-unit) * 20);
+  background: var(--px-void);
+}
+
+/* --- Intestazione --- */
+
+.rq-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(var(--px-unit) * 6);
+  margin-bottom: calc(var(--px-unit) * 7);
+}
+
+/*
+ * Il compagno fra il livello e gli XP di sempre.
+ *
+ * Lo spazio sopra non e' decorativo: le zeta del sonno e le stelline della
+ * festa escono dalla sagoma e senza finivano sopra il numero del livello. Il
+ * padding e' misurato sulle stelline, che salgono piu' delle zeta.
+ */
+.rq-head-pet {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  align-self: stretch;
+  padding-top: calc(var(--px-unit) * 6);
+}
+
+.rq-level {
+  font-family: var(--px-title);
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--px-ink);
+}
+
+.rq-title {
+  margin-top: calc(var(--px-unit) * 2);
+  font-family: var(--px-title);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--px-mana);
+}
+
+.rq-lifetime {
+  flex: none;
+  text-align: right;
+  font-family: var(--px-title);
+  font-size: 15px;
+  color: var(--px-gold);
+  white-space: nowrap;
+}
+
+.rq-lifetime span {
+  display: block;
+  margin-top: calc(var(--px-unit) * 2);
+  font-size: 8px;
+  color: var(--px-dim);
+}
+
+.rq-bar-caption {
+  margin-top: calc(var(--px-unit) * 4);
+  font-size: 13px;
+  color: var(--px-soft);
+}
+
+/* --- Riquadri statistiche --- */
+
+/*
+ * Due colonne, non quante ce ne stanno.
+ *
+ * A colonne strette "Giorni di fila" va a capo e il riquadro diventa piu' alto
+ * degli altri tre: meglio due riquadri larghi per riga, con l'etichetta su una
+ * riga sola.
+ */
+.rq-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: calc(var(--px-unit) * 5);
+  margin: calc(var(--px-unit) * 10) 0 0;
+}
+
+.rq-stat {
+  padding: calc(var(--px-unit) * 6) calc(var(--px-unit) * 5);
+  background: var(--px-panel);
+  border: var(--px-unit) solid var(--px-line);
+  /* Una fascia colorata a sinistra al posto delle icone: distingue i quattro
+     riquadri senza aggiungere disegni che a questa scala sarebbero illeggibili. */
+  border-left-width: calc(var(--px-unit) * 3);
+}
+
+.rq-stat-xp {
+  border-left-color: var(--px-gold);
+}
+.rq-stat-cards {
+  border-left-color: var(--px-sky);
+}
+.rq-stat-streak {
+  border-left-color: var(--px-flame);
+}
+.rq-stat-best {
+  border-left-color: var(--px-mana);
+}
+
+.rq-stat-value {
+  font-family: var(--px-title);
+  font-size: 18px;
+  line-height: 1.3;
+  color: var(--px-ink);
+}
+
+.rq-stat-label {
+  margin-top: calc(var(--px-unit) * 3);
+  font-family: var(--px-title);
+  font-size: 8px;
+  line-height: 1.6;
+  color: var(--px-dim);
+}
+
+/* --- Sezioni --- */
+
+.rq-section {
+  margin-top: calc(var(--px-unit) * 12);
+}
+
+.rq-section-title {
+  margin: 0 0 calc(var(--px-unit) * 5);
+  font-family: var(--px-title);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--px-dim);
+}
+
+.rq-empty {
+  margin: 0;
+  padding: calc(var(--px-unit) * 6);
+  background: var(--px-panel);
+  border: var(--px-unit) dashed var(--px-line);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--px-soft);
+}
+
+/* --- Boss --- */
+
+.rq-boss-row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px-unit) * 5);
+}
+
+.rq-boss-row > *:last-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rq-hp {
+  margin-top: calc(var(--px-unit) * 4);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--px-soft);
+}
+
+/* --- Righe di elenco: esami e missioni --- */
+
+.rq-exams,
+.rq-missions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--px-unit) * 4);
+}
+
+.rq-exam,
+.rq-mission {
+  display: flex;
+  gap: calc(var(--px-unit) * 5);
+  padding: calc(var(--px-unit) * 6) calc(var(--px-unit) * 5);
+  background: var(--px-panel);
+  border: var(--px-unit) solid var(--px-line);
+}
+
+.rq-exam {
+  align-items: center;
+  justify-content: space-between;
+  border-left: calc(var(--px-unit) * 3) solid var(--px-sky);
+}
+
+.rq-exam.is-urgent {
+  border-left-color: var(--px-blood);
+}
+
+.rq-exam-body {
+  min-width: 0;
+}
+
+.rq-exam-name {
+  display: block;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--px-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rq-exam-date {
+  display: block;
+  margin-top: calc(var(--px-unit) * 2);
+  font-size: 12px;
+  color: var(--px-soft);
+}
+
+.rq-exam-countdown {
+  flex: none;
+  font-family: var(--px-title);
+  font-size: 9px;
+  white-space: nowrap;
+  color: var(--px-soft);
+}
+
+.rq-exam.is-urgent .rq-exam-countdown {
+  color: var(--px-blood);
+}
+
+/* I gettoni salva-serie: si notano solo quando ce n'e' almeno uno */
+.rq-tokens {
+  margin-top: calc(var(--px-unit) * 4);
+  padding: calc(var(--px-unit) * 4);
+  background: var(--px-panel);
+  border-left: calc(var(--px-unit) * 3) solid var(--px-flame);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--px-soft);
+}
+
+/* --- Schede --- */
+
+/*
+ * Restano in vista mentre il contenuto scorre: sono la bussola del pannello, e
+ * doverle andare a ripescare in cima ogni volta le renderebbe inutili.
+ */
+/*
+ * Le schede vanno a capo quando la barra si stringe.
+ *
+ * `flex: 1 1 0` da solo non bastava: un elemento flex non scende sotto la
+ * larghezza del proprio contenuto, quindi con cinque schede in una barra
+ * stretta l'ultima usciva dal bordo destro invece di restringersi. Con il
+ * ritorno a capo si dispongono su due righe e restano tutte leggibili — il
+ * font a pixel non si puo' rimpicciolire oltre gli 8 px senza sfarinarsi.
+ */
+.rq-tabs {
+  position: sticky;
+  top: calc(var(--px-unit) * -10);
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--px-unit) * 2);
+  margin: calc(var(--px-unit) * 8) 0 0;
+  padding: calc(var(--px-unit) * 3) 0;
+  background: var(--px-void);
+}
+
+.rq-tab {
+  /* La base e' il contenuto, non zero: cosi' nessuna etichetta viene tagliata
+     e le schede della stessa riga si spartiscono lo spazio che avanza. */
+  flex: 1 1 auto;
+  padding: calc(var(--px-unit) * 4) calc(var(--px-unit) * 2);
+  border: var(--px-unit) solid var(--px-line);
+  background: var(--px-panel);
+  color: var(--px-dim);
+  font-family: var(--px-title);
+  font-size: 8px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: color 0.1s steps(2, end);
+}
+
+.rq-tab:hover:not(.is-active) {
+  color: var(--px-soft);
+  border-color: var(--px-dim);
+}
+
+/* La scheda aperta: bordo d'oro e fondo rialzato */
+.rq-tab.is-active {
+  background: var(--px-panel-up);
+  border-color: var(--px-gold);
+  color: var(--px-gold);
+}
+
+/* --- Prossimo sblocco --- */
+
+.rq-next {
+  margin-top: calc(var(--px-unit) * 5);
+  padding: calc(var(--px-unit) * 5);
+  background: var(--px-panel);
+  border-left: calc(var(--px-unit) * 3) solid var(--px-gold);
+}
+
+.rq-next-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--px-unit) * 4);
+  margin-bottom: calc(var(--px-unit) * 3);
+}
+
+.rq-next-note {
+  margin-top: calc(var(--px-unit) * 3);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--px-soft);
+}

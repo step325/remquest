@@ -1,0 +1,24 @@
+{
+  "manifestVersion": 1,
+  "id": "remquest",
+  "name": "Remquest",
+  "author": "step325",
+  "repoUrl": "https://github.com/step325/remquest",
+  "version": {
+    "major": 0,
+    "minor": 1,
+    "patch": 0
+  },
+  "theme": [],
+  "enableOnMobile": false,
+  "description": "Turn flashcard reviews into a 16-bit RPG: a boss made of your due cards, XP, streaks, daily quests, a 26-monster bestiary and companions.",
+  "requestNative": false,
+  "requiredScopes": [
+    {
+      "type": "All",
+      "level": "Read"
+    }
+  ],
+  "projectUrl": "https://github.com/step325/remquest",
+  "supportUrl": "https://github.com/step325/remquest/issues"
+}

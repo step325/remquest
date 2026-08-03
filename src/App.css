@@ -1,0 +1,27 @@
+/*
+ * Foglio di stile dei widget.
+ *
+ * Il nome NON e' arbitrario: l'SDK inietta in ogni widget un
+ * <link rel="stylesheet" href="App.css">, quindi questo e' l'unico CSS che
+ * RemNote carica davvero. Un file importato da un widget .tsx finirebbe in
+ * <widget>.css e non verrebbe mai richiesto.
+ *
+ * Qui dentro non ci sono regole, solo gli @import: css-loader li risolve in
+ * fase di build e in dist/ esce comunque un unico App.css. Gli stili veri
+ * stanno in src/styles/, divisi per zona.
+ *
+ * Gli @import stanno in cima perche' il CSS lo pretende.
+ */
+
+@import './styles/pixel.css';
+@import './styles/hud.css';
+@import './styles/panel.css';
+@import './styles/panel_missions.css';
+@import './styles/toast.css';
+@import './styles/themes.css';
+
+:host {
+  margin: 0;
+  line-height: 1.5;
+  font-family: inherit;
+}

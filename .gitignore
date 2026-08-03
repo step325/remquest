@@ -1,0 +1,11 @@
+node_modules
+dist
+dist-ssr
+*.local
+*.zip
+.DS_Store
+
+# Materiale di lavoro, non fa parte del plugin
+.session-logs/
+tasks/
+docs/remnote-sdk/

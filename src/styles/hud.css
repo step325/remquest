@@ -1,0 +1,638 @@
+/*
+ * HUD della coda: la striscia di gioco sotto la barra in alto.
+ *
+ * Vive dentro un iframe che non puo' disegnare fuori dai propri bordi, quindi
+ * i numeri di danno salgono dentro l'altezza del widget e non oltre. Da qui
+ * l'altezza fissa: e' lo spazio che serve alla salita.
+ */
+
+/*
+ * Il fondo lo mette questo contenitore, non html o body: toccare quelli
+ * significherebbe togliere ai widget lo sfondo che gli da' il tema di RemNote,
+ * e il pannello nella barra laterale diventerebbe bianco su bianco.
+ *
+ * L'iframe di un widget e' bianco finche' qualcosa non lo copre: percio' qui
+ * si prende tutta l'altezza disponibile, non i 76px nominali.
+ */
+.rq-hud-host {
+  /* Quanto sale un numero di danno. E' una variabile perche' RemNote comprime
+     la striscia quando la coda mostra i bottoni di risposta: le media query in
+     fondo la accorciano invece di lasciare che l'animazione finisca tagliata.
+     Il valore lo leggono i fotogrammi di px-rise. */
+  --px-rise: -30px;
+
+  /* Punto di riferimento dei numeri di danno: devono poter salire per tutta
+     l'altezza della striscia, non solo dentro il riquadro del boss. */
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  /*
+   * Contenuto in basso, non centrato: la meta' superiore resta libera e i
+   * numeri di danno hanno una corsia dove salire. Centrandolo, passavano
+   * sopra l'etichetta del boss e la barra HP e non si leggeva piu' niente.
+   */
+  align-items: flex-end;
+  /* Quello che esce viene tagliato comunque dall'iframe: tagliarlo qui evita
+     che il contenuto piu' alto dello spazio faccia comparire una barra di
+     scorrimento dentro la striscia. */
+  overflow: hidden;
+  background: var(--px-void);
+  border-bottom: var(--px-unit) solid var(--px-line);
+}
+
+/*
+ * Un tetto largo alla larghezza, non un blocchetto.
+ *
+ * Il primo tentativo non ne aveva nessuno e l'HUD seguiva la coda: su uno
+ * schermo intero le due barre diventavano righe lunghe un metro e la striscia
+ * si leggeva come una barra di stato. Il secondo aveva un max-width stretto,
+ * e restava un francobollo centrato in mezzo al vuoto. Il valore qui sotto sta
+ * in mezzo: piu' largo della colonna della coda, quindi l'HUD continua a
+ * coprire quello che si sta guardando, ma le barre smettono di allungarsi.
+ */
+.rq-hud {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px-unit) * 8);
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 calc(var(--px-unit) * 8) calc(var(--px-unit) * 5);
+}
+
+/* --- Boss --- */
+
+/*
+ * Le due barre si dividono lo spazio in proporzione, non "il boss prende
+ * quello che avanza": con `flex: 1 1 auto` la barra HP si mangiava mezza
+ * striscia e la XP restava un mozzicone schiacciato a destra.
+ */
+.rq-hud-boss {
+  position: relative;
+  display: flex;
+  /*
+   * Compagno e mostro poggiano sulla stessa linea invece di stare centrati
+   * l'uno rispetto all'altro: sono due figure alte diverso, e centrandole il
+   * piccolo galleggiava a mezz'aria. Con la base in comune diventa una scena.
+   */
+  align-items: flex-end;
+  gap: calc(var(--px-unit) * 4);
+  flex: 3 1 0;
+  min-width: 0;
+}
+
+/*
+ * L'arena: due piazzole, non un piedistallo solo.
+ *
+ * Un pavimento unico sotto le due figure attaccate le faceva sembrare una
+ * squadra in posa, non un duello: stessa linea, stessa aria, spalla a spalla.
+ * Ognuno ha la sua piazzola e in mezzo c'e' un varco — e' lo spazio vuoto fra
+ * i due a raccontare che sono uno di fronte all'altro.
+ *
+ * Il terreno resta sotto i piedi e non intorno: due sprite su fondo nero
+ * sembrano ritagli appoggiati sulla striscia, con una linea sotto stanno *in*
+ * un posto.
+ */
+.rq-hud-floor {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--px-unit) * 10);
+}
+
+.rq-hud-floor > * {
+  padding-bottom: calc(var(--px-unit) * 2);
+  border-bottom: var(--px-unit) solid var(--px-line);
+}
+
+/* Le barre non poggiano sul pavimento: stanno all'altezza dello sguardo */
+.rq-hud-boss > .rq-hud-meters {
+  align-self: center;
+}
+
+.rq-hud-meters {
+  flex: 1 1 auto;
+  min-width: 0;
+  /*
+   * Una barra ha una lunghezza utile oltre la quale non dice piu' niente: da
+   * mezzo metro di rosso non si capisce a occhio quanta vita resti meglio di
+   * quanto si capisca da venti centimetri. Il resto della striscia lo tiene il
+   * vuoto, che a schermo intero e' quello che fa sembrare l'HUD un HUD.
+   */
+  max-width: 560px;
+}
+
+.rq-hud-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--px-unit) * 4);
+  margin-bottom: calc(var(--px-unit) * 2);
+}
+
+.rq-hud-xp {
+  flex: 2 1 0;
+  min-width: 0;
+}
+
+.rq-hud-streak {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px-unit) * 2);
+  flex: none;
+}
+
+/*
+ * Interruttore dei suoni, in alto a destra.
+ *
+ * Fuori dalla riga e appoggiato all'angolo: si tocca una volta e poi non lo si
+ * cerca piu', mentre le barre e il boss si guardano a ogni card. In mezzo alla
+ * riga rubava spazio a quello che conta.
+ */
+.rq-hud-sound {
+  position: absolute;
+  top: calc(var(--px-unit) * 3);
+  right: calc(var(--px-unit) * 4);
+  display: flex;
+  padding: calc(var(--px-unit) * 1);
+  border: var(--px-unit) solid transparent;
+  background: none;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s steps(2, end);
+}
+
+.rq-hud-sound:hover {
+  opacity: 1;
+  border-color: var(--px-line);
+}
+
+/* Acceso resta pieno anche senza il mouse sopra: si deve vedere da lontano se
+   i suoni suoneranno. La sagoma pero' dice gia' tutto da sola. */
+.rq-hud-sound.is-on {
+  opacity: 1;
+}
+
+/* --- Strato degli effetti --- */
+
+/*
+ * I numeri partono dal fondo del boss e salgono dentro la striscia.
+ *
+ * Ancorarli a `bottom: 100%` del riquadro del boss li faceva partire gia' al
+ * bordo alto dell'iframe: salivano fuori dall'area visibile e non si vedevano
+ * mai, per quanto alta fosse la striscia.
+ *
+ * Non intercettano il mouse: la coda deve restare cliccabile mentre salgono.
+ */
+.rq-fx {
+  position: absolute;
+  /* Appena a destra dello sprite (48 px), non centrato su di lui: centrare un
+     "CRITICO! +25" largo il doppio del boss lo faceva uscire a sinistra dalla
+     striscia, che lo tagliava. */
+  left: 56px;
+  /* Parte dal bordo alto del boss, non dal suo fondo: da li' in su c'e' la
+     corsia libera, sotto ci sono l'etichetta e la barra. */
+  bottom: 100%;
+  width: 0;
+  height: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.rq-dmg {
+  position: absolute;
+  /* Cresce verso destra, dove c'e' spazio: nessun ancoraggio al centro. */
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--px-unit) * 3);
+  white-space: nowrap;
+  font-family: var(--px-title);
+  animation: px-rise 1.1s steps(9, end) forwards;
+}
+
+/* Il contorno cresce con il testo: due pixel attorno a un numero da venti
+   sparirebbero contro l'etichetta del boss, che sta alla stessa altezza. */
+.rq-dmg.px-outline {
+  text-shadow:
+    3px 0 0 var(--px-void),
+    -3px 0 0 var(--px-void),
+    0 3px 0 var(--px-void),
+    0 -3px 0 var(--px-void),
+    3px 3px 0 var(--px-void),
+    -3px -3px 0 var(--px-void),
+    3px -3px 0 var(--px-void),
+    -3px 3px 0 var(--px-void);
+}
+
+/* I punti vita tolti: e' il numero che conta, quindi e' quello grande */
+.rq-dmg-hit {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--px-blood);
+}
+
+/* Gli XP viaggiano insieme al danno ma sono un'altra cosa: piu' piccoli e in
+   oro, come la barra che vanno a riempire */
+.rq-dmg-xp {
+  font-size: 12px;
+  line-height: 1;
+  color: var(--px-gold);
+}
+
+.rq-dmg-tag {
+  font-size: 13px;
+  line-height: 1;
+  color: var(--px-flame);
+}
+
+/* Spento e grigio: non c'e' niente da festeggiare, ma si deve capire perche'
+   il contatore e' tornato a zero */
+.rq-dmg-miss {
+  font-size: 11px;
+  line-height: 1;
+  color: var(--px-dim);
+}
+
+.rq-dmg-crit {
+  animation:
+    px-rise 1.4s steps(11, end) forwards,
+    px-pop 0.24s steps(3, end);
+}
+
+.rq-dmg-crit .rq-dmg-hit {
+  font-size: 28px;
+  color: var(--px-flame);
+}
+
+.rq-spark {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  animation: px-fly 0.7s steps(6, end) forwards;
+}
+
+/* --- Taglio sul boss --- */
+
+.rq-boss {
+  position: relative;
+  /* inline-flex e non inline-block: un elemento inline si porta dietro lo
+     spazio del baseline, che rende il riquadro piu' alto dello sprite e manda
+     fuori centro tutto quello che ci si posiziona sopra. */
+  display: inline-flex;
+}
+
+/* Il taglio ricalca esattamente il riquadro del boss invece di essere piazzato
+   con scostamenti a mano: i due sprite hanno la stessa misura, quindi si
+   sovrappongono da soli e restano centrati a qualunque scala. */
+.rq-slash {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: px-slash 0.28s steps(4, end) forwards;
+}
+
+/* --- Combo --- */
+
+.rq-combo {
+  font-family: var(--px-title);
+  font-size: 10px;
+  color: var(--px-gold);
+}
+
+.rq-combo-2 {
+  color: var(--px-flame);
+}
+
+.rq-combo-3 {
+  color: var(--px-flame);
+  animation: px-throb 0.5s steps(2, end) infinite;
+}
+
+/* --- Reazioni del boss --- */
+
+.rq-boss-hit {
+  animation: px-shake 0.22s steps(4, end);
+}
+
+.rq-boss-down {
+  animation: px-sink 0.9s steps(6, end) forwards;
+}
+
+/* --- Fotogrammi --- */
+
+/* Sale e deriva verso destra: un arco si legge meglio di una salita dritta, e
+   allontana il numero dalle barre invece di passarci sopra. */
+@keyframes px-rise {
+  from {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(18px, var(--px-rise));
+    opacity: 0;
+  }
+}
+
+@keyframes px-pop {
+  0% {
+    scale: 0.5;
+  }
+  60% {
+    scale: 1.25;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+/* Il taglio entra gia' grande e si dilata sparendo: dura poco piu' di un
+   fotogramma per non coprire il boss che dovrebbe mostrare il colpo. */
+@keyframes px-slash {
+  0% {
+    opacity: 0;
+    scale: 0.7;
+  }
+  35% {
+    opacity: 1;
+    scale: 1.1;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.35;
+  }
+}
+
+@keyframes px-fly {
+  from {
+    transform: translate(-50%, 0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -34px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes px-shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes px-sink {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+
+@keyframes px-throb {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.45;
+  }
+}
+
+/*
+ * Coda larga (tutto schermo).
+ *
+ * Su una striscia lunga il boss da 48 px sembra un francobollo accanto a barre
+ * lunghe un metro: cresce anche lui. La misura la scrive React come stile
+ * inline, da qui serve !important; le misure sono multipli di 16, quindi i
+ * pixel restano quadrati.
+ *
+ * Il compagno cresce meno del boss e non lo raggiunge: la regola di prima
+ * prendeva ogni canvas della zona e li faceva grandi uguali, cosi' il
+ * compagno pareggiava il mostro — e finivano per sembrare due boss.
+ */
+/* Soglia bassa: la coda a schermo intero e' larga, ma anche una finestra
+   affiancata lo e' abbastanza perche' il boss da 48 px sembri un francobollo. */
+@media (min-width: 900px) {
+  .rq-hud-host .rq-figure-boss {
+    width: 64px !important;
+    height: 64px !important;
+  }
+
+  .rq-hud-host .rq-figure-pet {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .rq-fx {
+    /* Segue il boss cresciuto: meta' sprite piu' lo stacco */
+    left: 72px;
+  }
+
+  .px-label {
+    font-size: 9px;
+  }
+
+  .px-value {
+    font-size: 12px;
+  }
+}
+
+/*
+ * Striscia compressa.
+ *
+ * RemNote restringe l'iframe quando la coda ha bisogno di spazio per i bottoni
+ * di risposta, e da qui dentro non si puo' impedire. Invece di lasciare che
+ * l'HUD si deformi e i numeri finiscano tagliati, si accorcia la salita e si
+ * toglie il superfluo: i valori restano leggibili, spariscono le etichette.
+ */
+@media (max-height: 92px) {
+  .rq-hud-host {
+    --px-rise: -20px;
+  }
+}
+
+@media (max-height: 64px) {
+  .rq-hud-host {
+    --px-rise: -14px;
+  }
+
+  /* Le etichette sono la prima cosa a cadere: "115 card" si capisce anche
+     senza "BOSS DEL GIORNO" sopra, e cosi' le barre restano alte. */
+  .rq-hud-row .px-label {
+    display: none;
+  }
+
+  .rq-hud {
+    gap: calc(var(--px-unit) * 5);
+  }
+
+  /* Gli sprite scendono invece di farsi tagliare a meta'. Serve !important
+     perche' la misura la scrive React come stile inline, e sono multipli
+     esatti di 16: i pixel restano quadrati. */
+  .rq-hud-host .rq-figure-boss {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .rq-hud-host .rq-figure-pet {
+    width: 24px !important;
+    height: 24px !important;
+  }
+}
+
+/* Chi ha chiesto meno animazioni al sistema operativo non deve vedere niente
+   che si muove: gli effetti restano, ma statici. */
+@media (prefers-reduced-motion: reduce) {
+  .rq-dmg,
+  .rq-dmg-crit,
+  .rq-spark,
+  .rq-combo-3,
+  .rq-boss-hit,
+  .rq-boss-down {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+}
+
+/*
+ * Respiro del mostro.
+ *
+ * Un solo fotogramma per creatura, mosso su e giu' di un pixel a scatti: il
+ * bestiario resta ventisei disegni invece di cinquantadue, e l'effetto e' lo
+ * stesso di due fotogrammi alternati.
+ */
+.rq-boss-idle {
+  display: flex;
+  animation: px-idle 1.1s steps(1, end) infinite;
+}
+
+@keyframes px-idle {
+  0%,
+  50% {
+    transform: translateY(0);
+  }
+  51%,
+  100% {
+    transform: translateY(2px);
+  }
+}
+
+/* --- Compagno --- */
+
+/*
+ * Respira come il boss ma sfasato: all'unisono sembrerebbero lo stesso oggetto
+ * mosso da un solo motore.
+ */
+.rq-pet {
+  flex: none;
+  display: inline-flex;
+  animation: px-idle 1.1s steps(1, end) infinite;
+  animation-delay: 0.55s;
+}
+
+/* Balza in avanti quando colpisci: lui attacca, il boss incassa */
+.rq-pet.is-striking {
+  animation:
+    px-idle 1.1s steps(1, end) infinite 0.55s,
+    px-lunge 0.26s steps(3, end);
+}
+
+@keyframes px-lunge {
+  0% {
+    transform: translateX(0);
+  }
+  40% {
+    /* Attraversa buona parte del varco fra le due piazzole: con il salto
+       corto di prima, ora che c'e' spazio in mezzo, sembrava che si
+       sistemasse sul posto invece di andare addosso al mostro. */
+    transform: translateX(12px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* --- Umore del compagno --- */
+
+.rq-pet-wrap {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+}
+
+/* Dorme: respira piano e sta piu' basso */
+.rq-pet-wrap.is-asleep .rq-pet {
+  animation-duration: 2.6s;
+  transform: translateY(3px);
+}
+
+/* Festeggia: saltella invece di respirare */
+.rq-pet-wrap.is-happy .rq-pet {
+  animation: px-hop 0.6s steps(3, end) infinite;
+}
+
+/* Le zeta salgono e svaniscono, come si conviene */
+.rq-pet-zzz {
+  position: absolute;
+  bottom: 78%;
+  left: 60%;
+  pointer-events: none;
+  animation: px-zzz 2.6s steps(6, end) infinite;
+}
+
+/*
+ * Le stelline stanno sopra la testa, non attorno: centrate dentro il riquadro
+ * finivano dietro al compagno e non si vedevano affatto.
+ */
+.rq-pet-cheer {
+  position: absolute;
+  bottom: 74%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: px-throb 0.6s steps(2, end) infinite;
+}
+
+@keyframes px-hop {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes px-zzz {
+  0% {
+    transform: translate(0, 4px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(4px, -10px);
+    opacity: 0;
+  }
+}

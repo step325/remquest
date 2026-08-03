@@ -1,0 +1,54 @@
+{
+  "private": true,
+  "name": "remquest",
+  "version": "0.1.0",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "check-types": "tsc",
+    "test": "node --import ./tests/loader/register.mjs --test 'tests/unit/*.test.ts'",
+    "test:all": "./tests/run_all_tests.sh",
+    "dev": "cross-env NODE_ENV=development webpack serve --progress",
+    "build": "npx remnote-plugin validate && shx rm -rf dist && cross-env NODE_ENV=production webpack --progress && cd dist && bestzip ../PluginZip.zip ./*"
+  },
+  "dependencies": {
+    "@remnote/plugin-sdk": "^0.0.46",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "devDependencies": {
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.6.2",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.1.2",
+    "@types/react": "^17.0.93",
+    "@types/react-dom": "^17.0.26",
+    "bestzip": "^3.0.1",
+    "copy-webpack-plugin": "^14.0.0",
+    "cross-env": "^10.1.0",
+    "css-loader": "^7.1.4",
+    "esbuild-loader": "^4.5.0",
+    "glob": "^13.0.6",
+    "html-webpack-plugin": "^5.6.8",
+    "mini-css-extract-plugin": "^2.10.2",
+    "postcss": "^8.5.25",
+    "postcss-loader": "^8.2.1",
+    "react-refresh": "^0.18.0",
+    "shx": "^0.4.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "webpack": "^5.109.2",
+    "webpack-cli": "^7.2.2",
+    "webpack-dev-server": "^5.2.6"
+  },
+  "description": "Turn RemNote flashcard reviews into a 16-bit RPG.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/step325/remquest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/step325/remquest/issues"
+  },
+  "author": "step325"
+}

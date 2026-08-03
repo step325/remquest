@@ -1,0 +1,4 @@
+{
+  "//": "I test sono ESM; la root resta CommonJS per webpack.config.js e postcss.config.js.",
+  "type": "module"
+}
