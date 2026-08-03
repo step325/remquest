@@ -1,4 +1,4 @@
-<p align="center"><img src="docs/icon.png" width="96" alt="Remquest"></p>
+<p align="center"><img src="public/logo.png" width="96" alt="Remquest"></p>
 
 # Remquest
 
