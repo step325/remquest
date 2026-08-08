@@ -20,6 +20,8 @@ export const IT = {
   // --- Intestazione e statistiche ---
   'panel.level': 'Livello {n}',
   'panel.lifetime': 'XP totali',
+  'panel.close': 'Chiudi il pannello',
+  'panel.drag': 'Trascina per spostare il pannello',
   'panel.xpToNext': '{a} / {b} XP al livello {n}',
   'panel.statXp': 'XP oggi',
   'panel.statCards': 'Card fatte',
@@ -31,19 +33,17 @@ export const IT = {
 
   // --- Boss ---
   'boss.section': 'Boss del giorno',
-  'boss.none': 'Nessuna card in scadenza nei tuoi deck.',
+  'boss.none': 'Apri le flashcard: il boss si misura sulle card che RemNote ti mette in coda.',
   'boss.defeated': 'Boss sconfitto — obiettivo di oggi raggiunto',
   'boss.left': '{n} HP rimasti · {p}% di danno',
   'boss.hp': '{a} / {b} HP',
   'boss.cards': '{n} card',
-  'boss.backlog': '{n} arretrate',
 
   // --- Esami ---
   'exams.section': 'Esami in arrivo',
   'exams.error': 'Lettura degli esami non riuscita: {n}',
   'exams.noDecks': 'Nessun deck trovato nella knowledge base.{n}',
   'exams.noDates': 'Nessuna data d\'esame nei {a} rem controllati.{b}',
-  'exams.dailyGoal': '{n} card al giorno',
   'exams.unknownDate': 'data da controllare',
   'exams.today': 'oggi',
   'exams.tomorrow': 'domani',
@@ -97,8 +97,8 @@ export const IT = {
   'shop.refuseTokens': 'ne hai già il massimo',
 
   // --- Articoli in vendita ---
-  'item.theme:gameboy': 'Game Boy',
-  'item.theme:gameboy.desc': 'Quattro verdi e nient\'altro, come lo schermo del 1989',
+  'item.theme:gameboy': 'Verde tascabile',
+  'item.theme:gameboy.desc': 'Quattro verdi e nient\'altro, come le console a cristalli liquidi del 1989',
   'item.theme:crypt': 'Cripta',
   'item.theme:crypt.desc': 'Viola e ossa, per chi ripassa di notte',
   'item.theme:forge': 'Fucina',

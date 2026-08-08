@@ -18,8 +18,8 @@ finding it again would cost the same.
   `unmountComponentAtNode`, both removed in React 19.
 - **`WidgetLocation.Pane` is unusable**: RemNote cannot re-read a layout that
   contains a plugin pane, and merely resizing the window produces
-  `Cannot parse window string: (notes~)_(widget~...)_68`. Hence the right
-  sidebar. The command *Remquest: close leftover panes* strips stale
+  `Cannot parse window string: (notes~)_(widget~...)_68`. Hence the floating
+  widget below. The command *Remquest: close leftover panes* strips stale
   panes out of the layout.
 - **`plugin.window.closePane` does not exist** in 0.0.46 although the docs cite
   it: to close a pane you rewrite the tree with `setRemWindowTree`.
@@ -28,9 +28,38 @@ finding it again would cost the same.
   `plugin.app.registerCSS`, hooking the button's
   `data-test="Extension Sidebar Link <plugin name>"` (see
   `src/lib/sidebar_icon.ts`).
-- **The right sidebar has no read API.** Any navigation replaces its content and
-  the panel silently disappears; you cannot ask what is currently in there, only
-  put yours back (`src/lib/sticky_panel.ts`).
+- **The right sidebar is a dead end; use a floating widget.** In 0.0.46
+  `openWidgetInRightSidebar` is its *only* method — no close, no read, no
+  toggle — and there is no event for the user closing your panel. Worse, any
+  navigation drops the widget and the section falls back to RemNote's list of
+  installed plugins, which then sits in the sidebar with no way for a plugin to
+  clear or collapse it. Verified by turning the reopen setting off: with the
+  plugin never touching the sidebar, the list still appeared. Reopening the
+  panel over it only papered over the problem, and could not be told apart from
+  the user dismissing it.
+  `openFloatingWidget` / `closeFloatingWidget` / `isFloatingWidgetOpen` give all
+  three moves, no navigation takes the box away, and it needs no window tree —
+  so it also avoids the `Pane` breakage below (`src/lib/floating_panel.ts`).
+  Register the widget under `WidgetLocation.FloatingWidget` with a fixed
+  `dimensions.height`: inside the iframe that height is what `100vh` resolves
+  to, and it is what makes the panel scroll instead of overflowing. Pass
+  `closeWhenClickOutside: false` for anything meant to stay open while working,
+  and give it your own close button — RemNote draws no frame around it.
+- **A floating widget can be dragged, but you write the drag yourself.** RemNote
+  moves it only through `setFloatingWidgetPosition`, so the widget needs its own
+  grab strip (`src/ui/panel_grip.tsx`). Two things make it work from inside an
+  iframe: use `screenX`/`screenY`, because `clientX` is relative to the box and
+  the box is chasing the cursor — the difference would come back to nearly zero
+  and it would never start; and send *deltas*, because the widget cannot know
+  where on screen it is, so whoever opened it keeps the position. The pointer
+  stays over the strip for the whole drag precisely because the box follows it,
+  which is why the events keep arriving. `setPointerCapture` covers the moments
+  the box lags behind, and batching per animation frame keeps one message per
+  frame instead of one per mouse event.
+- **Broadcast is the only bridge between widgets.** They live in separate
+  iframes and cannot call each other; the panel's close button and its drag are
+  messages to the index widget, which owns the floating box
+  (`src/lib/panel_link.ts`).
 - **The knowledge base cannot be enumerated.** `plugin.card.getAll()` and
   `plugin.rem.getAll()` are gone ("Use plugin.rem.findMany", which wants ids you
   do not have). `taggedRem()` on the built-in powerups (Deck, Document,
@@ -40,9 +69,24 @@ finding it again would cost the same.
   siblings.
 - **`getPowerupSlotByCode` is no longer supported**: read values with
   `getPowerupProperty`.
-- **`getNumRemainingCards()`** returns `undefined` with the queue closed, and
-  with it open counts every practisable card rather than the due ones. Fallback
-  only.
+- **`getNumRemainingCards()` is the only honest source for "what is due".**
+  There is no API that answers it directly: `card.getAll()` and `rem.getAll()`
+  are gone, `Query.cardInfo(IsDue, …)` builds a query that nothing will execute
+  (it only configures table filters), the scheduler namespace exposes just
+  `registerCustomScheduler`, and the changelog up to 0.0.46 adds nothing.
+  Counting it yourself by walking decks does not work either: cards live in
+  documents *referenced* by a deck rather than under it, and the Daily Goal
+  belongs to no deck — on a real knowledge base the scan found 0 due while
+  RemNote asked for 13. Read it inside the queue instead, on `QueueLoadCard`
+  and not `QueueEnter` (at entry the queue does not know its size yet), and take
+  `cards done today + remaining` — that sum holds steady through a session and
+  grows with a second one. Confirmed on a real knowledge base: inside the queue
+  it reports the session, not every practisable card. An earlier note here
+  claimed the opposite; it was wrong.
+- **`ExamConfig`'s daily goal is a snapshot, not today's plan.** It said 107
+  cards a day for an exam holding seven cards and a PDF, while RemNote asked for
+  three. It is written when the exam is configured and never re-reads reality;
+  the exam date next to it is fine.
 - **No XP for cards created**: that would need two full scans of the knowledge
   base to compare, which is not possible.
 - **Exam dates arrive as UTC timestamps** (`2026-08-31T22:00:00.000Z`) and are
@@ -50,9 +94,17 @@ finding it again would cost the same.
   previous day.
 - **The app's language is not exposed.** `navigator.language` inside the widget
   is the closest thing available.
+- **The marketplace page renders your `README.md` into rem.** The `>` in front
+  of the text on the plugin page is a rem bullet, not markdown. The file is
+  shipped by `npm run build` (webpack copies it into `dist/`) and served next to
+  the manifest, but a README that opens with raw HTML — a `<p align="center">`
+  around the logo, in our case — produced *"No plugin description available."*,
+  while plugins whose README starts with `# Title` show theirs. The `description`
+  field in the manifest is only the short line (<200 chars) in the listing, not
+  that page. Keep the README plain markdown from the first line.
 
 ## Support
 
 Remquest is free and stays free. If it made a wall of due cards easier to climb:
 
-<a href="https://www.buymeacoffee.com/step325" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me a Coffee" height="48"></a>
+[Buy me a coffee](https://www.buymeacoffee.com/step325)

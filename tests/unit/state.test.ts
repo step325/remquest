@@ -101,8 +101,8 @@ test('normalizeBossState', async (t) => {
   const saved = (extra: Record<string, unknown>) => ({ ...freshBossState(TODAY), ...extra });
 
   await t.test("l'arretrato viene conservato accanto agli HP", () => {
-    assert.equal(normalizeBossState(saved({ backlog: 702 }), TODAY).backlog, 702);
-    assert.equal(normalizeBossState(saved({ backlog: 'tante' }), TODAY).backlog, 0);
+    assert.equal(normalizeBossState(saved({ queueRead: 702 }), TODAY).queueRead, 702);
+    assert.equal(normalizeBossState(saved({ queueRead: 'tante' }), TODAY).queueRead, 0);
   });
 
   await t.test('conserva il conteggio di oggi', () => {

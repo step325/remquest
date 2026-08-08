@@ -22,6 +22,8 @@ export const EN: Record<keyof typeof IT, string> = {
   // --- Header and stats ---
   'panel.level': 'Level {n}',
   'panel.lifetime': 'total XP',
+  'panel.close': 'Close the panel',
+  'panel.drag': 'Drag to move the panel',
   'panel.xpToNext': '{a} / {b} XP to level {n}',
   'panel.statXp': 'XP today',
   'panel.statCards': 'Cards done',
@@ -33,19 +35,17 @@ export const EN: Record<keyof typeof IT, string> = {
 
   // --- Boss ---
   'boss.section': 'Boss of the day',
-  'boss.none': 'No cards due in your decks.',
+  'boss.none': 'Open your flashcards: the boss is measured on what RemNote queues up for you.',
   'boss.defeated': 'Boss down — today\'s goal reached',
   'boss.left': '{n} HP left · {p}% damage',
   'boss.hp': '{a} / {b} HP',
   'boss.cards': '{n} cards',
-  'boss.backlog': '{n} overdue',
 
   // --- Exams ---
   'exams.section': 'Exams ahead',
   'exams.error': 'Could not read the exams: {n}',
   'exams.noDecks': 'No deck found in the knowledge base.{n}',
   'exams.noDates': 'No exam date in the {a} rem checked.{b}',
-  'exams.dailyGoal': '{n} cards a day',
   'exams.unknownDate': 'date to check',
   'exams.today': 'today',
   'exams.tomorrow': 'tomorrow',
@@ -99,8 +99,8 @@ export const EN: Record<keyof typeof IT, string> = {
   'shop.refuseTokens': 'you already have the most',
 
   // --- Goods ---
-  'item.theme:gameboy': 'Game Boy',
-  'item.theme:gameboy.desc': 'Four greens and nothing else, like the screen of 1989',
+  'item.theme:gameboy': 'Pocket Green',
+  'item.theme:gameboy.desc': 'Four greens and nothing else, like a handheld screen from 1989',
   'item.theme:crypt': 'Crypt',
   'item.theme:crypt.desc': 'Purple and bone, for reviewing at night',
   'item.theme:forge': 'Forge',

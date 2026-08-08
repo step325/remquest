@@ -65,25 +65,17 @@ export function ExamRow({
   dateText,
   countdown,
   urgent,
-  dailyGoal,
-  t,
 }: {
   name: string;
   dateText: string;
   countdown: string;
   urgent: boolean;
-  dailyGoal?: number;
-  t: Translate;
 }) {
-  const goal = dailyGoal ? ` · ${t('exams.dailyGoal', { n: dailyGoal })}` : '';
   return (
     <li className={`rq-exam${urgent ? ' is-urgent' : ''}`}>
       <div className="rq-exam-body">
         <span className="rq-exam-name">{name}</span>
-        <span className="rq-exam-date">
-          {dateText}
-          {goal}
-        </span>
+        <span className="rq-exam-date">{dateText}</span>
       </div>
       <span className="rq-exam-countdown">{countdown}</span>
     </li>

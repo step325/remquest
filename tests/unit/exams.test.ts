@@ -9,7 +9,6 @@ import {
   daysUntil,
   upcomingExams,
   countdownLabel,
-  parseDailyGoal,
   type Exam,
 } from '../../src/lib/exams';
 
@@ -93,25 +92,6 @@ test('countdownLabel', async (t) => {
   });
 });
 
-test('parseDailyGoal', async (t) => {
-  await t.test("legge l'obiettivo dal JSON di ExamConfig", () => {
-    const config = JSON.stringify({
-      version: 2,
-      examDate: '2026-08-31T22:00:00.000Z',
-      dailyGoalRangeMin: 52,
-      dailyGoalRangeMax: 80,
-    });
-    assert.equal(parseDailyGoal(config), 52);
-  });
-
-  await t.test('undefined su configurazioni che non conosciamo', () => {
-    assert.equal(parseDailyGoal('{"version":2}'), undefined);
-    assert.equal(parseDailyGoal('{"dailyGoalRangeMin":"tante"}'), undefined);
-    assert.equal(parseDailyGoal('non json'), undefined);
-    assert.equal(parseDailyGoal(undefined), undefined);
-    assert.equal(parseDailyGoal(42), undefined);
-  });
-});
 
 test('parseExamDate con timestamp UTC', async (t) => {
   await t.test('il formato che usa RemNote non slitta di un giorno', () => {
@@ -123,42 +103,5 @@ test('parseExamDate con timestamp UTC', async (t) => {
 
   await t.test('timestamp non valido non passa per buono', () => {
     assert.equal(parseExamDate('2026-13-45T99:00:00.000Z'), null);
-  });
-});
-
-test('parseDailyGoal nel periodo di recupero', async (t) => {
-  // Configurazione reale: 52 a regime, ma 123 finche' si recupera l'arretrato
-  const config = JSON.stringify({
-    version: 2,
-    examDate: '2026-08-31T22:00:00.000Z',
-    dailyGoalRangeMin: 52,
-    dailyGoalRangeMax: 70,
-    catchUpPeriod: { dailyGoalMin: 123, dailyGoalMax: 160, untilDateString: 'Tue Aug 11 2026' },
-  });
-
-  await t.test('durante il recupero vale il ritmo alto', () => {
-    assert.equal(parseDailyGoal(config, new Date(2026, 7, 2)), 123);
-  });
-
-  await t.test("l'ultimo giorno del recupero e' ancora incluso", () => {
-    assert.equal(parseDailyGoal(config, new Date(2026, 7, 11, 23, 0)), 123);
-  });
-
-  await t.test('finito il recupero si torna al ritmo normale', () => {
-    assert.equal(parseDailyGoal(config, new Date(2026, 7, 12)), 52);
-    assert.equal(parseDailyGoal(config, new Date(2026, 7, 20)), 52);
-  });
-
-  await t.test('senza periodo di recupero vale sempre il ritmo normale', () => {
-    const plain = JSON.stringify({ dailyGoalRangeMin: 52 });
-    assert.equal(parseDailyGoal(plain, new Date(2026, 7, 2)), 52);
-  });
-
-  await t.test('data di fine illeggibile: si ignora il recupero', () => {
-    const broken = JSON.stringify({
-      dailyGoalRangeMin: 52,
-      catchUpPeriod: { dailyGoalMin: 123, untilDateString: 'quando capita' },
-    });
-    assert.equal(parseDailyGoal(broken, new Date(2026, 7, 2)), 52);
   });
 });

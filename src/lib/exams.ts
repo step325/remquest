@@ -21,46 +21,15 @@ export interface Exam {
   name: string;
   /** Testo originale della data, sempre mostrabile */
   dateText: string;
-  /** Giorni mancanti, o null se la data non e' stata interpretata */
+  /**
+   * Giorni mancanti, o null se la data non e' stata interpretata.
+   *
+   * Il conto alla rovescia e' l'unica cosa affidabile di un esame. Il "card al
+   * giorno" dello slot `ExamConfig` veniva mostrato qui e diceva 107 su un
+   * esame che ne aveva sette: e' un numero salvato alla configurazione, non
+   * quello che RemNote chiede oggi.
+   */
   daysLeft: number | null;
-  /** Card al giorno che RemNote si aspetta per arrivare pronti all'esame */
-  dailyGoal?: number;
-}
-
-/**
- * Obiettivo giornaliero dallo slot ExamConfig.
- *
- * Il JSON contiene due ritmi: `dailyGoalRangeMin` e' quello a regime, mentre
- * `catchUpPeriod` e' il recupero dell'arretrato e vale finche' non si arriva a
- * `untilDateString`. E' il secondo a spiegare le 123 card che RemNote propone
- * oggi a fronte di 702 scadute: l'arretrato viene spalmato, non chiesto tutto
- * insieme.
- */
-export function parseDailyGoal(examConfig: unknown, now: Date = new Date()): number | undefined {
-  if (typeof examConfig !== 'string') return undefined;
-
-  let config: Record<string, unknown>;
-  try {
-    const parsed: unknown = JSON.parse(examConfig);
-    if (!parsed || typeof parsed !== 'object') return undefined;
-    config = parsed as Record<string, unknown>;
-  } catch {
-    return undefined; // configurazione in un formato che non conosciamo
-  }
-
-  const catchUp = config.catchUpPeriod;
-  if (catchUp && typeof catchUp === 'object') {
-    const { dailyGoalMin, untilDateString } = catchUp as Record<string, unknown>;
-    if (typeof dailyGoalMin === 'number' && Number.isFinite(dailyGoalMin)) {
-      const until = typeof untilDateString === 'string' ? new Date(untilDateString) : null;
-      const stillCatchingUp =
-        until !== null && !Number.isNaN(until.getTime()) && daysUntil(until, now) >= 0;
-      if (stillCatchingUp) return dailyGoalMin;
-    }
-  }
-
-  const min = config.dailyGoalRangeMin;
-  return typeof min === 'number' && Number.isFinite(min) ? min : undefined;
 }
 
 /**

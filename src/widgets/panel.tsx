@@ -56,6 +56,8 @@ import {
 } from '../lib/storage';
 import { countdownLabel } from '../lib/exams';
 import { Bar, Stat, MissionRow, ExamRow, Section } from '../ui/components';
+import { CloseButton } from '../ui/panel_buttons';
+import { PanelGrip } from '../ui/panel_grip';
 import { PixelSprite } from '../ui/pixel_sprite';
 import { CHEST_OPEN } from '../ui/sprites';
 import { monsterSprite } from '../ui/monsters';
@@ -149,6 +151,9 @@ function Panel() {
     // `px` porta palette, font e primitive condivise con l'HUD della coda:
     // le due schermate devono sembrare lo stesso gioco.
     <div className={`px rq ${themeClass(wallet)} ${prestige.className}`.trim()}>
+      {/* Il riquadro fluttuante non ha una barra del titolo di RemNote: quella
+          da cui si trascina, e la × per chiudere, sono roba nostra. */}
+      <PanelGrip t={t} />
       <header className="rq-head">
         {/* Il blocco del livello e' anche il posto dove si vede il prestigio:
             le decorazioni sono roba di src/styles/panel_prestige.css, qui basta
@@ -176,6 +181,9 @@ function Panel() {
         <div className="rq-lifetime">
           {streak.lifetimeXp.toLocaleString(lang)} <span>{t('panel.lifetime')}</span>
         </div>
+        {/* Il riquadro fluttuante non ha una cornice di RemNote con cui
+            chiuderlo: la × dev'essere nostra. */}
+        <CloseButton t={t} />
       </header>
 
       {/* L'involucro serve alle scintille del secondo grado: `px-bar` la usano
@@ -236,7 +244,6 @@ function Panel() {
               <div className="rq-hp">
                 {t('boss.hp', { a: Math.max(0, boss.maxHp - remaining), b: boss.maxHp })}
                 {boss.cardsPlanned > 0 && ` · ${t('boss.cards', { n: boss.cardsPlanned })}`}
-                {boss.backlog > boss.cardsPlanned && ` · ${t('boss.backlog', { n: boss.backlog })}`}
               </div>
             </div>
           </div>
@@ -253,8 +260,6 @@ function Panel() {
                 dateText={exam.dateText}
                 countdown={countdownLabel(t, exam.daysLeft)}
                 urgent={exam.daysLeft !== null && exam.daysLeft <= 7}
-                dailyGoal={exam.dailyGoal}
-                t={t}
               />
             ))}
           </ul>

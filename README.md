@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/step325/remquest/main/public/logo.png" width="96" alt="Remquest">
-</p>
-
 # Remquest
 
 Turn RemNote flashcard reviews into a 16-bit RPG. Today's due cards are a
@@ -31,10 +27,9 @@ change instead of becoming wallpaper.
 🏆 **Deeds and bestiary.** Permanent milestones, and a 26-monster collection:
 dark silhouette until you meet it, full colour once you take it down.
 
-📅 **Exam countdown.** Decks with an exam date show the days left and how many
-cards a day it takes to get there.
+📅 **Exam countdown.** Decks with an exam date show the days left.
 
-🎨 **Shop.** Coins buy four screen themes (Game Boy DMG, Crypt, Forge,
+🎨 **Shop.** Coins buy four screen themes (Pocket Green, Crypt, Forge,
 Parchment), companions and streak tokens. Never stat boosts. It is slow on
 purpose: a full day pays 35 coins and the cheapest item costs 250, so the first
 one arrives after a week of studying rather than on the second evening.
@@ -44,9 +39,10 @@ one arrives after a week of studying rather than on the second evening.
 ## How it works
 
 1. Open the review queue as usual. A game strip appears above the cards.
-2. The monster's HP comes from what is due today. Each answer deals damage: 5 to
-   10 XP and 3 to 7 damage depending on the button you press, doubled on a 20%
-   critical hit.
+2. The monster's HP comes from the queue itself — whatever RemNote lined up for
+   you today, so the number always matches the app. It is therefore unknown
+   until you start a session. Each answer deals damage: 5 to 10 XP and 3 to 7
+   damage depending on the button you press, doubled on a 20% critical hit.
 3. The first time a card falls in a day it pays a bonus of 15 XP.
 4. Complete quests, take down the boss, earn coins.
 5. At local midnight the day resets. The streak, the deeds and the bestiary do
@@ -57,8 +53,11 @@ sources are capped, because the point is not to grind.
 
 ## The panel
 
-Click **Remquest** in the sidebar. It opens on the right and stays there while
-you move around.
+Click **Remquest** in the sidebar. It opens as a floating box and stays put
+while you move around; click again to close it, or use the × in its corner.
+Drag it by the dotted strip along its top edge and it opens there next time; it
+cannot be dragged off screen, and the command *Remquest: bring the panel back*
+puts it in the corner if it ever ends up somewhere you cannot reach.
 
 | Tab | What's in it |
 |---|---|
@@ -86,9 +85,6 @@ once.
 
 **Language.** Italian or English. By default it follows RemNote.
 
-**Keep the panel open.** Puts the panel back in the right sidebar after you
-navigate away. On by default.
-
 **Full-screen flashcards.** Widens the queue to the whole window.
 
 **Danger zone.** Wipes XP, level, coins, streak, bestiary, deeds and history. It
@@ -104,4 +100,4 @@ in RemNote's own synced storage, under keys prefixed `rq_`.
 
 Remquest is free and stays free. If it made a wall of due cards easier to climb:
 
-<a href="https://www.buymeacoffee.com/step325" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me a Coffee" height="48"></a>
+[Buy me a coffee](https://www.buymeacoffee.com/step325)

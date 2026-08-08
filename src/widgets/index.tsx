@@ -1,17 +1,12 @@
-import {
-  AppEvents,
-  declareIndexPlugin,
-  type ReactRNPlugin,
-  WidgetLocation,
-} from '@remnote/plugin-sdk';
-import { startEngine } from '../lib/engine';
+import { declareIndexPlugin, type ReactRNPlugin, WidgetLocation } from '@remnote/plugin-sdk';
+import { type Engine, startEngine } from '../lib/engine';
 import { treeWithoutWidgetPanes } from '../lib/panes';
 import { refreshExams } from '../lib/read_exams';
 import { runDiagnostics } from '../lib/diagnostics';
 import { playFxDemo } from '../lib/fx_demo';
 import { applyQueueFullscreen, registerFullscreenSetting } from '../lib/queue_fullscreen';
 import { KEY_BOSS, freshBossState } from '../lib/storage';
-import { type StickyState, shouldReopen } from '../lib/sticky_panel';
+import { type FloatingPanel, PANEL_SIZE, floatingPanel } from '../lib/floating_panel';
 import { sidebarIconCss } from '../lib/sidebar_icon';
 import { spriteDataUrl } from '../ui/sprite_png';
 import { QUEST_ICON } from '../ui/sprites';
@@ -43,66 +38,26 @@ const TOAST = 'toast';
  */
 const HUD_HEIGHT = 148;
 
-/** Interruttore della riapertura automatica del pannello */
-const SETTING_STICKY = 'remquest-sticky-panel';
-
-let stopEngine: (() => void) | undefined;
-
-/**
- * Stato della riapertura.
- *
- * Vive in memoria e non nello storage di proposito: «tienilo aperto» vale per
- * la sessione in corso. Riaprire il pannello al primo cambio di pagina dopo un
- * riavvio, a chi non lo ha chiesto oggi, sarebbe un pannello che compare da
- * solo.
- */
-const sticky: StickyState = { sticky: false, lastOpenAt: 0 };
-
-/** Apre il pannello e da' quel momento lo tiene aperto */
-async function openPanel(plugin: ReactRNPlugin) {
-  sticky.sticky = true;
-  sticky.lastOpenAt = Date.now();
-  await plugin.window.openWidgetInRightSidebar(WIDGET);
-}
-
-/**
- * Il plugin acceso.
- *
- * Serve perche' il listener della navigazione dev'essere la stessa funzione
- * all'aggiunta e alla rimozione: una chiusura creata dentro `onActivate`
- * sarebbe un'altra funzione, e `removeListener` non toglierebbe niente.
- */
-let host: ReactRNPlugin | undefined;
-
-const onNavigate = () => {
-  if (host) void reopenPanel(host);
-};
-
-/** Rimette il pannello dopo una navigazione, se e' il caso */
-async function reopenPanel(plugin: ReactRNPlugin) {
-  if (!shouldReopen(sticky, Date.now())) return;
-  if ((await plugin.settings.getSetting(SETTING_STICKY)) === false) return;
-
-  sticky.lastOpenAt = Date.now();
-  try {
-    await plugin.window.openWidgetInRightSidebar(WIDGET);
-  } catch {
-    // La barra puo' non essere pronta durante il cambio pagina: al prossimo
-    // evento ci si riprova, non c'e' niente da riparare.
-  }
-}
+let engine: Engine | undefined;
+let panel: FloatingPanel | undefined;
 
 async function onActivate(plugin: ReactRNPlugin) {
-  host = plugin;
   // Il conteggio degli XP vive qui, non nel widget: entrando nella coda a
-  // schermo intero la barra laterale sparisce e con lei il widget montato.
-  stopEngine = startEngine(plugin);
+  // schermo intero il pannello puo' non essere aperto, e i listener che
+  // vivessero dentro di lui morirebbero con lui.
+  const motore = startEngine(plugin);
+  engine = motore;
 
-  // Barra laterale destra, non Pane: RemNote non riesce a rileggere il layout
-  // quando contiene un pane di plugin e basta ridimensionare per rompere tutto
-  // ("Cannot parse window string").
-  await plugin.app.registerWidget(WIDGET, WidgetLocation.RightSidebar, {
-    dimensions: { height: 'auto', width: '100%' },
+  // Riquadro sovrapposto, non barra laterale e non Pane. La barra destra non si
+  // puo' ne' chiudere ne' leggere e ogni navigazione ci lasciava dentro
+  // l'elenco dei plugin di RemNote; il Pane rompe il layout ("Cannot parse
+  // window string"). Il riquadro fluttuante si apre, si chiude, risponde se e'
+  // aperto, e nessuna navigazione se lo porta via.
+  const pannello = floatingPanel(plugin, WIDGET);
+  panel = pannello;
+
+  await plugin.app.registerWidget(WIDGET, WidgetLocation.FloatingWidget, {
+    dimensions: PANEL_SIZE,
     widgetTabTitle: PLUGIN_NAME,
   });
 
@@ -118,29 +73,25 @@ async function onActivate(plugin: ReactRNPlugin) {
     dimensions: { height: 'auto', width: 300 },
   });
 
+  // Lo stesso bottone apre e chiude: un pannello che si apre e basta obbliga a
+  // cercare la × ogni volta, e la voce di barra e' li' sotto il pollice.
   const open = {
     id: 'remquest-open',
     name: PLUGIN_NAME,
-    action: () => void openPanel(plugin),
+    action: () => void pannello.toggle(),
   };
   await plugin.app.registerSidebarButton(open);
   await plugin.app.registerCommand(open);
   await applySidebarIcon(plugin);
 
-  await plugin.settings.registerBooleanSetting({
-    id: SETTING_STICKY,
-    title: `Keep ${PLUGIN_NAME} open`,
-    description:
-      'Puts the panel back in the right sidebar when you navigate away. Turn it off to reopen it by hand.',
-    defaultValue: true,
+  // La via d'uscita se il pannello e' finito dove il mouse non lo raggiunge: il
+  // limite del trascinamento e' il monitor, non la finestra di RemNote.
+  await plugin.app.registerCommand({
+    id: 'remquest-panel-home',
+    name: `${PLUGIN_NAME}: bring the panel back`,
+    description: 'Puts the panel back in the top right corner',
+    action: () => void pannello.home(),
   });
-
-  // Cambiare pagina rimpiazza il contenuto della barra di destra e il pannello
-  // sparisce senza che nessuno lo abbia chiuso. Non c'e' modo di chiedere a
-  // RemNote cosa c'e' dentro la barra, quindi lo si rimette: la pausa in
-  // sticky_panel.ts evita che una singola navigazione lo riapra tre volte.
-  plugin.event.addListener(AppEvents.URLChange, undefined, onNavigate);
-  plugin.event.addListener(AppEvents.GlobalOpenRem, undefined, onNavigate);
 
   await plugin.app.registerCommand({
     id: 'remquest-close-stale-panes',
@@ -177,7 +128,7 @@ async function onActivate(plugin: ReactRNPlugin) {
   await plugin.app.registerCommand({
     id: 'remquest-reset-boss',
     name: `${PLUGIN_NAME}: reset today\'s boss`,
-    description: 'Clears the due-card count; it is rebuilt on the next queue',
+    description: 'Throws away today\'s boss; the next queue measures it again',
     action: () => void plugin.storage.setLocal(KEY_BOSS, freshBossState()),
   });
 
@@ -230,13 +181,11 @@ async function closeStalePanes(plugin: ReactRNPlugin) {
   }
 }
 
-async function onDeactivate(plugin: ReactRNPlugin) {
-  stopEngine?.();
-  stopEngine = undefined;
-  sticky.sticky = false;
-  host = undefined;
-  plugin.event.removeListener(AppEvents.URLChange, undefined, onNavigate);
-  plugin.event.removeListener(AppEvents.GlobalOpenRem, undefined, onNavigate);
+async function onDeactivate() {
+  engine?.stop();
+  engine = undefined;
+  panel?.stop();
+  panel = undefined;
 }
 
 declareIndexPlugin(onActivate, onDeactivate);

@@ -1,22 +1,20 @@
 /**
  * Il boss del giorno: l'obiettivo di oggi, ferito dalle card che completi.
  *
- * `plugin.queue.getNumRemainingCards()` non serve: fuori dalla coda restituisce
- * undefined e dentro restituisce tutte le card praticabili della knowledge base
- * (3442), non quelle della sessione. Gli HP vengono percio' dall'obiettivo
- * giornaliero dichiarato dal deck in `ExamConfig` — 123 card durante il
- * recupero dell'arretrato, 52 a regime — e il danno dalle card fatte oggi.
+ * Gli HP vengono da `plugin.queue.getNumRemainingCards()`, letta a card
+ * caricata: `fatte oggi + rimaste` e' il programma di RemNote, e coincide con
+ * quello che l'applicazione mostra nel suo "Today's Goal".
+ *
+ * Prima si contavano le card scadute scandendo i deck. Sbagliava alla radice —
+ * le card stanno in documenti referenziati dal deck e non appesi sotto, e il
+ * "Daily Goal" non appartiene a nessun deck: su una knowledge base vera dava 0
+ * mentre RemNote chiedeva 13 card.
  */
 
 import type { RNPlugin } from '@remnote/plugin-sdk';
-import {
-  bossRemaining,
-  type DayState,
-  HP_PER_CARD,
-  crossedHalfway,
-} from './gamification';
+import { bossRemaining, type DayState, crossedHalfway } from './gamification';
+import { planFor, plannedFromQueue } from './boss_plan';
 import type { FxEmitter } from './fx';
-import { countDueCards } from './due_cards';
 import { averageCards } from './history';
 import { todayKey } from './dates';
 import {
@@ -48,28 +46,26 @@ export interface BossDeps {
 }
 
 /**
- * Ricalcola quanto e' grosso il boss di oggi.
+ * Misura il boss dalla coda aperta.
  *
- * Costa qualche secondo (scandisce i discendenti dei deck), quindi va chiamata
- * di rado: all'avvio, ad intervalli e all'uscita dalla coda. Il danno inflitto
- * durante la sessione lo aggiorna `applyBossDamage`, che non costa nulla.
+ * Da chiamare quando una card viene caricata: all'ingresso in coda RemNote non
+ * sa ancora quante ne ha, e il boss nascerebbe con gli HP delle card gia'
+ * fatte. Non costa niente, quindi si puo' rifare ad ogni card — la somma
+ * `fatte + rimaste` non si muove durante la sessione.
  */
-export async function refreshBossPlan(deps: BossDeps): Promise<void> {
-  const counted = await countDueCards(deps.plugin).catch(() => null);
-  if (!counted) return;
+export async function measureBoss(deps: BossDeps): Promise<void> {
+  const letto = await deps.plugin.queue.getNumRemainingCards().catch(() => undefined);
+  if (typeof letto !== 'number' || !Number.isFinite(letto)) return;
 
   const today = todayKey();
   const [boss, day] = [await readBoss(deps.plugin, today), await deps.currentDay()];
 
-  // Il boss non rimpicciolisce a meta' giornata: se l'obiettivo cala mentre si
-  // studia, gli HP restano quelli con cui la battaglia e' cominciata.
-  const maxHp = Math.max(boss.maxHp, counted.today * HP_PER_CARD);
+  // La regola sta in boss_plan.ts: il piano non torna mai indietro.
+  const { maxHp, cardsPlanned } = planFor(boss, plannedFromQueue(day, letto));
+  if (maxHp === 0) return; // coda vuota: non c'e' nessun boss da misurare
 
-  const cardsPlanned = Math.max(boss.cardsPlanned, counted.today);
-
-  // Il mostro si sceglie una volta sola, al primo conteggio della giornata:
-  // rifarlo a ogni ricalcolo lo cambierebbe sotto gli occhi quando la media o
-  // il carico si spostano di poco.
+  // Il mostro si sceglie una volta sola, alla prima misura della giornata:
+  // rifarlo ad ogni card lo cambierebbe sotto gli occhi.
   const monster =
     boss.maxHp > 0
       ? boss.monster
@@ -80,7 +76,7 @@ export async function refreshBossPlan(deps: BossDeps): Promise<void> {
     maxHp,
     cardsPlanned,
     remaining: bossRemaining(maxHp, cardsPlanned, day),
-    backlog: counted.backlog,
+    queueRead: letto,
     monster,
   });
 

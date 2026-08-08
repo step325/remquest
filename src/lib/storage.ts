@@ -45,6 +45,13 @@ export const KEY_WALLET = 'rq_wallet';
 /** Scheda aperta nel pannello (locale: e' una preferenza di questo schermo) */
 export const KEY_TAB = 'rq_tab';
 /**
+ * Dove l'utente ha trascinato il riquadro del pannello.
+ *
+ * Locale e non sincronizzata: dipende da quanto e' grande questo schermo, e un
+ * angolo comodo sul monitor grande finisce fuori dal portatile.
+ */
+export const KEY_PANEL_POS = 'rq_panel_pos';
+/**
  * Lingua delle scritte (sincronizzata).
  *
  * Sta nello storage e non nelle impostazioni di RemNote perche' la leggono in
@@ -70,7 +77,7 @@ export async function readLang(plugin: RNPlugin): Promise<Lang> {
  * senza questo controllo resterebbe in cache finche' l'utente non lo azzera a
  * mano (e' successo con i 3003 HP del conteggio via `card.getAll()`).
  */
-export const BOSS_FORMAT = 5;
+export const BOSS_FORMAT = 7;
 
 /** Ultimo conteggio noto dei punti vita del boss di oggi */
 export interface BossState {
@@ -84,8 +91,14 @@ export interface BossState {
   maxHp: number;
   /** Card in programma per oggi: il boss cade comunque quando finiscono */
   cardsPlanned: number;
-  /** Card scadute in tutto: il boss ne affronta solo la fetta di oggi */
-  backlog: number;
+  /**
+   * L'ultimo numero letto dalla coda, com'era.
+   *
+   * Il piano e' `fatte + rimaste` e non si vede piu' da nessuna parte: tenere
+   * il valore grezzo permette di accorgersi se la coda dicesse qualcosa di
+   * assurdo, invece di fidarsi di una somma che torna sempre.
+   */
+  queueRead: number;
   /**
    * Chi si affronta oggi, deciso una volta sola.
    *
@@ -103,7 +116,7 @@ export const freshBossState = (day: string = todayKey()): BossState => ({
   maxHp: 0,
   cardsPlanned: 0,
   monster: monsterForDay(day, 0, 0),
-  backlog: 0,
+  queueRead: 0,
 });
 
 export function normalizeBossState(value: unknown, fallbackDay: string = todayKey()): BossState {
@@ -122,7 +135,7 @@ export function normalizeBossState(value: unknown, fallbackDay: string = todayKe
     maxHp: typeof p.maxHp === 'number' && Number.isFinite(p.maxHp) ? p.maxHp : 0,
     cardsPlanned:
       typeof p.cardsPlanned === 'number' && Number.isFinite(p.cardsPlanned) ? p.cardsPlanned : 0,
-    backlog: typeof p.backlog === 'number' && Number.isFinite(p.backlog) ? p.backlog : 0,
+    queueRead: typeof p.queueRead === 'number' && Number.isFinite(p.queueRead) ? p.queueRead : 0,
     monster: normalizeMonster(p.monster, base.monster),
   };
 }

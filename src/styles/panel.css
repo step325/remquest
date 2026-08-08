@@ -10,14 +10,14 @@
 /*
  * Il pannello scorre dentro il proprio riquadro.
  *
- * `height` e non `min-height`: e' la differenza fra un box alto quanto la
- * finestra e uno che si allunga oltre. Con `min-height` il contenuto piu' lungo
+ * `height` e non `min-height`: e' la differenza fra un box alto quanto il
+ * riquadro e uno che si allunga oltre. Con `min-height` il contenuto piu' lungo
  * faceva crescere il box, `overflow-y` non aveva niente da far scorrere, e
  * RemNote non allunga l'iframe del widget — quindi tutto quello che stava sotto
  * spariva senza modo di raggiungerlo.
  *
- * Dentro un iframe `100vh` e' l'altezza dell'iframe, che qui e' quella della
- * barra laterale: e' esattamente la misura giusta.
+ * Dentro un iframe `100vh` e' l'altezza dell'iframe, cioe' l'altezza dichiarata
+ * per il widget in src/widgets/index.tsx: e' esattamente la misura giusta.
  */
 .rq {
   height: 100vh;
@@ -25,6 +25,66 @@
   padding: calc(var(--px-unit) * 10) calc(var(--px-unit) * 8)
     calc(var(--px-unit) * 20);
   background: var(--px-void);
+}
+
+/*
+ * La striscia da cui si trascina il pannello.
+ *
+ * `fixed` come la ×: dentro un iframe si aggancia al riquadro, quindi resta
+ * afferrabile anche a pannello scorso. I puntini sono la stessa grammatica del
+ * resto — quattro pixel di luce, quattro di buio — e dicono «qui si prende»
+ * senza bisogno di scriverlo.
+ */
+.rq-grip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--px-unit) * 7);
+  z-index: 3;
+  cursor: grab;
+  /* Trascinare non deve selezionare il testo sotto, ne' far scorrere la
+     pagina sui dispositivi a tocco. */
+  user-select: none;
+  touch-action: none;
+  background-image: radial-gradient(var(--px-line) 1px, transparent 1px);
+  background-size: 4px 4px;
+  background-position: center;
+}
+
+.rq-grip:active {
+  cursor: grabbing;
+}
+
+/*
+ * Il riquadro fluttuante e' nostro fin sui bordi: RemNote non ci mette intorno
+ * nessuna cornice, quindi la × per chiuderlo dev'essere qui dentro. Sta
+ * staccata dal flusso perche' l'intestazione e' gia' piena — livello a
+ * sinistra, compagno in mezzo, XP a destra — e una quarta colonna li
+ * schiaccerebbe tutti.
+ */
+.rq-close {
+  /* `fixed` e non `absolute`: dentro un iframe si aggancia al riquadro, quindi
+     resta al suo posto mentre il pannello scorre. Con `absolute` scenderebbe
+     via col contenuto e a meta' pagina non ci sarebbe piu' modo di chiudere. */
+  position: fixed;
+  top: calc(var(--px-unit) * 2);
+  right: calc(var(--px-unit) * 3);
+  /* Sopra la striscia di trascinamento, che le passa davanti da bordo a bordo:
+     sotto, la meta' alta della × non si potrebbe cliccare. */
+  z-index: 4;
+  padding: 0 calc(var(--px-unit) * 2);
+  border: none;
+  background: transparent;
+  color: var(--px-dim);
+  font-family: var(--px-title);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rq-close:hover {
+  color: var(--px-gold);
 }
 
 /* --- Intestazione --- */
@@ -35,6 +95,9 @@
   justify-content: space-between;
   gap: calc(var(--px-unit) * 6);
   margin-bottom: calc(var(--px-unit) * 7);
+  /* Spazio per la × in alto a destra: senza, gli XP di sempre ci finiscono
+     sotto e il numero si legge a meta'. */
+  padding-right: calc(var(--px-unit) * 7);
 }
 
 /*
@@ -184,6 +247,12 @@
   font-size: 13px;
   line-height: 1.6;
   color: var(--px-soft);
+}
+
+/* Sta sotto la barra e non accanto: e' un ripiego, non l'azione principale
+   della sezione, e la barra ha bisogno di tutta la larghezza. */
+.rq-recount {
+  margin-top: calc(var(--px-unit) * 4);
 }
 
 /* --- Righe di elenco: esami e missioni --- */
@@ -337,4 +406,13 @@
   font-size: 13px;
   line-height: 1.6;
   color: var(--px-soft);
+}
+
+/* Il dettaglio della scansione sotto «nessuna card»: e' un dato di servizio,
+   deve stare li' senza rubare la scena al messaggio. */
+.rq-scan {
+  display: block;
+  margin-top: calc(var(--px-unit) * 3);
+  font-size: 11px;
+  color: var(--px-dim);
 }

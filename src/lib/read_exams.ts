@@ -2,12 +2,11 @@
 
 import { BuiltInPowerupCodes, type RNPlugin } from '@remnote/plugin-sdk';
 import type { RemObject } from '@remnote/plugin-sdk/dist/name_spaces/rem';
-import { type Exam, parseExamDate, parseDailyGoal, daysUntil, upcomingExams } from './exams';
+import { type Exam, parseExamDate, daysUntil, upcomingExams } from './exams';
 import { findDecks } from './decks';
 import { KEY_EXAMS, type ExamsState } from './storage';
 
 const EXAM_DATE_SLOT = 'ExamSchedulerDate';
-const EXAM_CONFIG_SLOT = 'ExamConfig';
 
 /** Legge la data d'esame di un deck, se ce l'ha */
 async function examOf(plugin: RNPlugin, rem: RemObject, now: Date): Promise<Exam | null> {
@@ -22,21 +21,12 @@ async function examOf(plugin: RNPlugin, rem: RemObject, now: Date): Promise<Exam
 
   const parsed = parseExamDate(dateText);
   const name = rem.text ? await plugin.richText.toString(rem.text) : '';
-  let dailyGoal: number | undefined;
-  try {
-    dailyGoal = parseDailyGoal(
-      await rem.getPowerupProperty(BuiltInPowerupCodes.Deck, EXAM_CONFIG_SLOT)
-    );
-  } catch {
-    // Deck senza configurazione d'esame: si mostra comunque la data
-  }
 
   return {
     name: name.trim() || 'Esame senza nome',
     // RemNote salva un timestamp UTC: all'utente si mostra la data locale
     dateText: parsed ? parsed.toLocaleDateString('it-IT') : dateText,
     daysLeft: parsed ? daysUntil(parsed, now) : null,
-    dailyGoal,
   };
 }
 

@@ -27,7 +27,7 @@ import { type FxInput, pushFx } from './fx';
 import { MISSION_REWARD, MISSIONS_PER_DAY, missionReward, missionsForDay } from './missions';
 import { levelFromXp, levelProgress } from './levels';
 import { refreshExams } from './read_exams';
-import { refreshBossPlan, applyBossDamage } from './boss';
+import { measureBoss, applyBossDamage } from './boss';
 import { dayBeforeKey, todayKey, yesterdayKey } from './dates';
 import {
   readDay,
@@ -62,7 +62,14 @@ function newlyCompleted(before: DayState, after: DayState) {
   );
 }
 
-export function startEngine(plugin: RNPlugin): () => void {
+export interface Engine {
+  /** Spegne il motore e stacca i suoi ascoltatori */
+  stop: () => void;
+  /** Rilegge le date d'esame subito, senza aspettare l'intervallo */
+  refreshExams: () => Promise<void>;
+}
+
+export function startEngine(plugin: RNPlugin): Engine {
   const notifier = new Notifier(plugin);
   let lastEditingXpAt = 0;
 
@@ -280,8 +287,14 @@ export function startEngine(plugin: RNPlugin): () => void {
   };
 
   const bossDeps = { plugin, currentDay, notifier, emit: emitNow, bumpTotals, payCoins };
-  /** Ricalcolo completo: costa qualche secondo, si fa di rado */
-  const planBoss = () => serialize(() => refreshBossPlan(bossDeps));
+  /**
+   * Misura il boss su quello che dice la coda.
+   *
+   * Ad ogni card caricata e non solo alla prima: all'ingresso in coda RemNote
+   * non sa ancora quante ne ha, e la somma «fatte + rimaste» non si muove
+   * durante la sessione, quindi rifarla non costa ne' cambia niente.
+   */
+  const planBoss = () => serialize(() => measureBoss(bossDeps));
   /** Solo il danno delle card fatte: leggero, si fa ad ogni card */
   const damageBoss = () => serialize(() => applyBossDamage(bossDeps));
 
@@ -338,28 +351,30 @@ export function startEngine(plugin: RNPlugin): () => void {
   const onQueueExit = () => {
     void recordHistory();
     void refreshExams(plugin);
-    void planBoss();
     void announceRecap();
   };
 
   plugin.event.addListener(AppEvents.QueueCompleteCard, undefined, onCompleteCard);
   plugin.event.addListener(AppEvents.EditorTextEdited, undefined, onEdit);
   plugin.event.addListener(AppEvents.QueueExit, undefined, onQueueExit);
+  plugin.event.addListener(AppEvents.QueueLoadCard, undefined, planBoss);
 
   void refreshExams(plugin);
-  void planBoss();
-  // Il conto alla rovescia degli esami e le card in scadenza vanno rifatti
-  // almeno quando scatta la mezzanotte con l'app aperta.
+  // Il conto alla rovescia degli esami va rifatto almeno quando scatta la
+  // mezzanotte con l'app aperta. Il boss no: lo misura la coda.
   const timer = setInterval(() => {
     void recordHistory();
     void refreshExams(plugin);
-    void planBoss();
   }, EXAM_REFRESH_MS);
 
-  return () => {
-    clearInterval(timer);
-    plugin.event.removeListener(AppEvents.QueueCompleteCard, undefined, onCompleteCard);
-    plugin.event.removeListener(AppEvents.EditorTextEdited, undefined, onEdit);
-    plugin.event.removeListener(AppEvents.QueueExit, undefined, onQueueExit);
+  return {
+    refreshExams: async () => void (await refreshExams(plugin)),
+    stop: () => {
+      clearInterval(timer);
+      plugin.event.removeListener(AppEvents.QueueCompleteCard, undefined, onCompleteCard);
+      plugin.event.removeListener(AppEvents.EditorTextEdited, undefined, onEdit);
+      plugin.event.removeListener(AppEvents.QueueExit, undefined, onQueueExit);
+      plugin.event.removeListener(AppEvents.QueueLoadCard, undefined, planBoss);
+    },
   };
 }
