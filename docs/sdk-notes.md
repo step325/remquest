@@ -107,6 +107,11 @@ finding it again would cost the same.
   images. Tables are untested by any working example, so the tab list here is
   bullets. **Confirmed**: with the HTML gone the page renders the whole README —
   heading, paragraphs, `## Features`, bold and emoji.
+- **`changelogUrl` is accepted but not shown.** The manifest validator takes it
+  and the marketplace serves it, yet the plugin page's Details column lists only
+  *Get help* (`projectUrl`), *Repository* (`repoUrl`) and *Report bugs*
+  (`supportUrl`) — no changelog entry, as of August 2026. Setting it costs
+  nothing and may pay off later; do not spend a release on it.
 - **Pushing to GitHub publishes nothing.** The marketplace serves the zip you
   upload, not the repo: proof is `changelogUrl`, pushed and still absent from
   the served manifest an hour later. The repo is what the review reads
