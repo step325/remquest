@@ -59,13 +59,12 @@ Drag it by the dotted strip along its top edge and it opens there next time; it
 cannot be dragged off screen, and the command *Remquest: bring the panel back*
 puts it in the corner if it ever ends up somewhere you cannot reach.
 
-| Tab | What's in it |
-|---|---|
-| **Journal** | level, XP today, cards done, streak, boss of the day, exams ahead, three daily quests |
-| **Chronicle** | the last thirty days as a strip, plus permanent deeds |
-| **Bestiary** | all 26 monsters, met and defeated |
-| **Shop** | coins, next unlock, themes and companions |
-| **Settings** | language, and wiping your progress |
+- **Journal**: level, XP today, cards done, streak, boss of the day, exams
+  ahead, three daily quests
+- **Chronicle**: the last thirty days as a strip, plus permanent deeds
+- **Bestiary**: all 26 monsters, met and defeated
+- **Shop**: coins, next unlock, themes and companions
+- **Settings**: language, and wiping your progress
 
 ## Three things it deliberately doesn't do
 

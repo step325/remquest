@@ -101,7 +101,11 @@ finding it again would cost the same.
   around the logo, in our case — produced *"No plugin description available."*,
   while plugins whose README starts with `# Title` show theirs. The `description`
   field in the manifest is only the short line (<200 chars) in the listing, not
-  that page. Keep the README plain markdown from the first line.
+  that page. Keep the README plain markdown from the first line. What is known
+  to render, from a plugin whose page shows in full (oxdev03-focus-timer):
+  headings, paragraphs, bullet and numbered lists, bold, emoji, markdown
+  images. Tables are untested by any working example, so the tab list here is
+  bullets.
 
 ## Support
 
