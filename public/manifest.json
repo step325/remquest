@@ -20,5 +20,6 @@
     }
   ],
   "projectUrl": "https://github.com/step325/remquest",
-  "supportUrl": "https://github.com/step325/remquest/issues"
+  "supportUrl": "https://github.com/step325/remquest/issues",
+  "changelogUrl": "https://github.com/step325/remquest/blob/main/CHANGELOG.md"
 }
