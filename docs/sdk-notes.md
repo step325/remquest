@@ -105,7 +105,18 @@ finding it again would cost the same.
   to render, from a plugin whose page shows in full (oxdev03-focus-timer):
   headings, paragraphs, bullet and numbered lists, bold, emoji, markdown
   images. Tables are untested by any working example, so the tab list here is
-  bullets.
+  bullets. **Confirmed**: with the HTML gone the page renders the whole README —
+  heading, paragraphs, `## Features`, bold and emoji.
+- **Pushing to GitHub publishes nothing.** The marketplace serves the zip you
+  upload, not the repo: proof is `changelogUrl`, pushed and still absent from
+  the served manifest an hour later. The repo is what the review reads
+  (`repoUrl`), so it has to match the zip *at upload time*, and every change
+  needs the full round — bump the version, `npm run build`, Upload plugin. The
+  version number is taken once used: the same one will not replace what is
+  already there. Users, on the other hand, update by themselves; RemNote pulls
+  new versions automatically and only leaves alone the plugins they disabled.
+  An update to an already-approved plugin went live the same day (0.1.0 →
+  0.3.0), so whatever review happens for updates did not hold it back.
 
 ## Support
 
