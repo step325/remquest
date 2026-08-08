@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1
+
+This page now has a link of its own on the plugin's page: the changelog was in
+the repository all along, with nothing pointing at it.
+
 ## 0.3.0
 
 Everything below was found by using the plugin for real against a knowledge
